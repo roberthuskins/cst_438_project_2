@@ -9,10 +9,11 @@ import com.google.firebase.cloud.FirestoreClient;
 import csumb.edu.project2.objects.User;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * This class has all the helper methods that allow us to put/update/remove objects in the database.
+ */
 @Service
 public class FirebaseService {
     public void saveUserDetails(User user) throws ExecutionException, InterruptedException {

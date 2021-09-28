@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 
+/***
+ * This class initializes the connection to Firestore. It is run automatically because of the @PostConstruct method.
+ * Autoruns when the spring app starts or when a unit test with @SpringBootTest is ran.
+ */
 @Service
 public class FirebaseInitialize {
 

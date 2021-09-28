@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Integration test for our database. The timers are to prevent flakiness due to latency.
+ */
 @SpringBootTest
 public class FirebaseServiceTest {
     @Autowired

@@ -30,4 +30,6 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
+.vscode
+
+laundrylist-687e2-firebase-adminsdk-staqg-86c89737bc.json

@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * This class has all the helper methods that allow us to put/update/remove objects in the database.
  */
+
 @Service
 public class FirebaseService {
     public void saveUserDetails(User user) throws ExecutionException, InterruptedException {
@@ -22,6 +23,7 @@ public class FirebaseService {
     }
 
     public User getUserDetails(String name) throws ExecutionException, InterruptedException {
+
         Firestore dbFirestore = FirestoreClient.getFirestore();
         DocumentReference documentReference = dbFirestore.collection("users").document(name);
         ApiFuture<DocumentSnapshot> future = documentReference.get();
@@ -33,7 +35,7 @@ public class FirebaseService {
         if(document.exists()) {
             user = document.toObject(User.class);
             if (user.getPassword() == null || user.getUsername() == null) {
-                //If object doens't exist firebase still gives us an Object with all the fields null
+                //If object doesn't exist firebase still gives us an Object with all the fields null
                 //This if statement forces it to return a null object if the object doesn't exist
                 return null;
             }
@@ -50,6 +52,7 @@ public class FirebaseService {
         ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("users").document(user.getUsername()).update("username", user.getUsername());
 
     }
+
 
     public void deleteUser(User user) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();

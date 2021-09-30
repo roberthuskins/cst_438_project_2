@@ -14,4 +14,10 @@ public class controller {
     public String register(){
         return "register";
     }
+
+    @RequestMapping("/signin")
+    public String login(){
+        return "login";
+    }
+
 }

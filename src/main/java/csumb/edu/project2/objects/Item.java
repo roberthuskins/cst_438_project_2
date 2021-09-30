@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Item {
 
-    private int price;
+    private double price;
     private String name;
     private String shopURL;
     private String imageURL;
@@ -14,18 +14,19 @@ public class Item {
         super();
     }
 
-    public Item(int price, String name, String shopURL, String imageURL) {
+
+    public Item(double price, String name, String shopURL, String imageURL) {
         this.price = price;
         this.name = name;
         this.shopURL = shopURL;
         this.imageURL = imageURL;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

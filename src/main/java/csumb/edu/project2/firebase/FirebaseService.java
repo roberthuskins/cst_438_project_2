@@ -33,7 +33,7 @@ public class FirebaseService {
         if(document.exists()) {
             user = document.toObject(User.class);
             if (user.getPassword() == null || user.getUsername() == null) {
-                //If object doens't exist firebase still gives us an Object with all the fields null
+                //If object doens't exist firebas```﻿e still gives us an Object with all the fields null
                 //This if statement forces it to return a null object if the object doesn't exist
                 return null;
             }

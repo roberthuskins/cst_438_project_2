@@ -1,12 +1,36 @@
 package csumb.edu.project2.controller;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 @Controller
 public class WebController {
     @RequestMapping("/")
-    public String index() {
+    public String index(Model model) throws IOException {
+        String apiURL = "http://localhost:8080/items";
+
+        URL url = new URL(apiURL);
+        URLConnection request = url.openConnection();
+        request.connect();
+
+        // Convert to a JSON object to print data
+        JsonParser jp = new JsonParser(); //from gson
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+        JsonArray rootobj = root.getAsJsonArray(); //May be an array, may be an object.
+        model.addAttribute("lists", rootobj);
+
         return "index";
     }
 

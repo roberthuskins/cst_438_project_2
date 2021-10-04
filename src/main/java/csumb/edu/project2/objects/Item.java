@@ -14,7 +14,6 @@ public class Item {
         super();
     }
 
-
     public Item(double price, String name, String shopURL, String imageURL) {
         this.price = price;
         this.name = name;

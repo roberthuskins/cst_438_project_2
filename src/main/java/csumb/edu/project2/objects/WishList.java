@@ -8,6 +8,7 @@ import java.util.List;
 @Component
 public class WishList {
 
+
     private String username;
     private List<ArrayList> items;
 

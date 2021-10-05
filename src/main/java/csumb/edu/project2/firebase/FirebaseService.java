@@ -6,7 +6,9 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
+import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
+import csumb.edu.project2.objects.WishList;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
@@ -16,10 +18,12 @@ import java.util.concurrent.ExecutionException;
  */
 @Service
 public class FirebaseService {
+
     public void saveUserDetails(User user) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).set(user);
     }
+
 
     public User getUserDetails(String name) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
@@ -48,7 +52,6 @@ public class FirebaseService {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).update("password", user.getPassword());
         ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("users").document(user.getUsername()).update("username", user.getUsername());
-
     }
 
     public void deleteUser(User user) throws ExecutionException, InterruptedException {

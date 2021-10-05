@@ -9,15 +9,25 @@ import java.util.List;
 public class WishList {
 
     private String username;
-    private List<ArrayList> items;
+    private String listName;
+    private List<Item> items;
 
     public WishList() {
         super();
     }
 
-    public WishList(String username, List<ArrayList> items) {
+    public WishList(String username, String listName, List<Item> items) {
         this.username = username;
+        this.listName = listName;
         this.items = items;
+    }
+
+    public String getListName() {
+        return listName;
+    }
+
+    public void setListName(String listName) {
+        this.listName = listName;
     }
 
     public String getUsername() {
@@ -28,11 +38,11 @@ public class WishList {
         this.username = username;
     }
 
-    public List<ArrayList> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(List<ArrayList> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 }

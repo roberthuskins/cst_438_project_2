@@ -1,24 +1,34 @@
 package csumb.edu.project2.controller;
 
+import csumb.edu.project2.firebase.FirebaseService;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
-import csumb.edu.project2.objects.WishList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Class that handles all the REST API routes
  */
 @RestController
 public class APIController {
+    @Autowired FirebaseService firebaseService;
 
     @PutMapping("/newUser")
     public String newUser(@RequestParam String username, @RequestParam String password) {
-        return "new user added";
+        try {
+            firebaseService.saveUserDetails(new User(username, password));
+        } catch (ExecutionException e) {
+            return "Execution Exception";
+        } catch (InterruptedException e) {
+            return "Interrupted Exception";
+        }
+
+        return "User added successfully.";
     }
 
     @PostMapping("/login")
@@ -68,16 +78,57 @@ public class APIController {
 
     @GetMapping("/users")
     public List<User> users() {
-        return Arrays.asList(new User("guillermo@guillermo.com", "long"), new User("rob@rob.com", "long"));
+        try {
+            List<User> users = firebaseService.getAllUsers();
+            return users;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @PutMapping("/users")
     public String createUser(@RequestParam String username, @RequestParam String password) {
-        return "user created";
+        try {
+            firebaseService.saveUserDetails(new User(username, password));
+        } catch (ExecutionException e) {
+            return "Execution Exception";
+        } catch (InterruptedException e) {
+            return "Interrupted Exception";
+        }
+
+        return "User added successfully.";
     }
 
-    @PatchMapping
+    @PatchMapping("/users")
     public String updateUser(@RequestParam String username, @RequestParam String password) {
-        return "user updated";
+        try {
+            firebaseService.updateUserDetails(new User(username, password));
+        } catch (ExecutionException e) {
+            return "Execution Exception";
+        } catch (InterruptedException e) {
+            return "Interrupted Exception";
+        }
+
+        return "User edited successfully.";
     }
+
+    @DeleteMapping("/users")
+    public String deleteUser(@RequestParam String username) {
+        try {
+            User myUser = firebaseService.getUserDetails(username);
+            firebaseService.deleteUser(myUser);
+            return myUser.getUsername() + " has been deleted successfully.";
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return "User not deleted successfully.";
+    }
+
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
     <head>
         <meta charset = "ISO-8859-1" />
         <link href = "css/styles.css" rel = "stylesheet"/>
@@ -18,11 +19,9 @@
 
         <div class="container">
             <div class="d-flex justify-content-around" style="margin:25px">
-                <div class="col-sm">Hello</div>
-                <div class="col-sm">Hello</div>
-                <div class="col-sm">Hello</div>
-                <div class="col-sm">Hello</div>
-                <div class="col-sm">Hello</div>
+                <tr th:each="names : ${listNames}">
+                    <td th:text="${names}">List Name</td>
+                </tr>
             </div>
         </div>
 

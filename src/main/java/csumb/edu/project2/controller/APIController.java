@@ -58,6 +58,12 @@ public class APIController {
         return "item added";
     }
 
+    //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
+    @GetMapping("/wishlists")
+    public List<WishList> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list) {
+        return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )));
+    }
+
     /* Admin endpoints go below here */
 
     @GetMapping("/users")

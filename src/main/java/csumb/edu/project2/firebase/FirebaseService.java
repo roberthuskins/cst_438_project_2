@@ -1,16 +1,15 @@
 package csumb.edu.project2.firebase;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
 import csumb.edu.project2.objects.WishList;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -45,6 +44,21 @@ public class FirebaseService {
         } else {
             return null;
         }
+    }
+
+    public List<User> getAllUsers() throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference collectionReference = dbFirestore.collection("users");
+        ApiFuture<QuerySnapshot> future = collectionReference.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        List<User> out = new ArrayList<User>();
+        for (DocumentSnapshot document : documents) {
+            out.add(document.toObject(User.class));
+        }
+
+        return out;
     }
 
     //for firebase save and update are the same thing

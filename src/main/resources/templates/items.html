@@ -3,22 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/styles.css" rel="stylesheet" type="text/css" />
+    <link href="/static.css/styles.css" rel="stylesheet" type="text/css" />
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
     <title>Users Items for Wish List</title>
+    <style>
+        .modal-header{
+            background: green;
+            color: white;
+        }
+        .required:after{
+            content:"*";
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Wish Lists</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">New Item</button>
         <div class="modal" id="myModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Adding New Items</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label required">Item Name</label>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Price</label>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Shop Url</label>
+                                <input type="url" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Image</label>
+                                <input type="url" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Choose Wish List</label><br>
+                                <select name="WishListItems" id="WishListItems">
+                                    <option value="Empty">Empty</option>
+                                    <option value="rigatoni">WishList1</option>
+                                    <option value="dave">WishList2</option>
+                                    <option value="pumpernickel">WishList3</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
             </div>

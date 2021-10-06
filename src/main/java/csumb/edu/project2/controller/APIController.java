@@ -3,9 +3,12 @@ package csumb.edu.project2.controller;
 import csumb.edu.project2.firebase.FirebaseService;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
+import csumb.edu.project2.objects.WishList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,9 +36,27 @@ public class APIController {
 
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password) {
-        return "login successful";
+        HttpServletResponse httpResponse = null;
+        try {
+            List<User> users = firebaseService.getAllUsers();
+            for (User user: users){
+                if(user.getUsername().equals(username) && user.getPassword().equals(password)){
+                    return "Successfully Logged In";
+                }
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return "Not successful";
     }
 
+    @RequestMapping("/test")
+    public String test(@RequestParam("testValue") String testValue, HttpServletResponse httpResponse) throws Exception {
+        httpResponse.sendRedirect("/signin");
+        return null;
+    }
     @PostMapping("/logout")
     public String logout(@RequestParam String username) {
         return "logout with just username successful";

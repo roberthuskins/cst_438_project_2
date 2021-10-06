@@ -22,7 +22,6 @@ import java.util.concurrent.ExecutionException;
 @RestController
 public class APIController {
     @Autowired FirebaseService firebaseService;
-    HttpServletResponse response;
 
     @PutMapping("/newUser")
     public String newUser(@RequestParam String username, @RequestParam String password) {
@@ -50,7 +49,7 @@ public class APIController {
         // Redirect code credit: https://stackoverflow.com/a/47411493
         //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("http://localhost:8080"));
+        headers.setLocation(URI.create("/"));
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 

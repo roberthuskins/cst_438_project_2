@@ -55,9 +55,26 @@ public class APIController {
 
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        return "login successful";
+    public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password) throws IOException{
+        try {
+            List<User> users = firebaseService.getAllUsers();
+            for (User user: users){
+                if(user.getUsername().equals(username) && user.getPassword().equals(password)){
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setLocation(URI.create("/"));
+                    return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+                }
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/signin"));
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
+
 
     @PostMapping("/logout")
     public String logout(@RequestParam String username) {

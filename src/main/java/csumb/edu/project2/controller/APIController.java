@@ -3,6 +3,7 @@ package csumb.edu.project2.controller;
 import csumb.edu.project2.firebase.FirebaseService;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
+import csumb.edu.project2.objects.WishList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

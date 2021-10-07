@@ -1,6 +1,7 @@
 package csumb.edu.project2.firebase;
 
 import csumb.edu.project2.objects.User;
+import csumb.edu.project2.objects.WishList;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,4 +63,5 @@ public class FirebaseServiceTest {
 
         firebaseService.deleteUser(newUser);
     }
+
 }

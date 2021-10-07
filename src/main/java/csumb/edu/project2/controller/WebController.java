@@ -48,4 +48,9 @@ public class WebController {
         return "login";
     }
 
+    @RequestMapping("/myitems")
+    public String items(){
+        return "items";
+    }
+
 }

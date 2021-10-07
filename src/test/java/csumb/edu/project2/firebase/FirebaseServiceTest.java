@@ -1,10 +1,15 @@
 package csumb.edu.project2.firebase;
 
+import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
+import csumb.edu.project2.objects.WishList;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -44,9 +49,7 @@ public class FirebaseServiceTest {
         firebaseService.deleteUser(tempUser);
         TimeUnit.SECONDS.sleep(5);
 
-        assertEquals(null,firebaseService.getUserDetails("test1@test.com"));
-
-
+        assertEquals(null, firebaseService.getUserDetails("test1@test.com"));
     }
 
     @Test
@@ -61,5 +64,47 @@ public class FirebaseServiceTest {
         assertEquals("test3", mynewPassword);
 
         firebaseService.deleteUser(newUser);
+    }
+
+    @Test
+    public void testInsertWishList() throws ExecutionException, InterruptedException {
+        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        firebaseService.saveWishListDetails(wishList);
+        TimeUnit.SECONDS.sleep(5);
+
+        TimeUnit.SECONDS.sleep(5);
+
+        assertEquals("test2@test.com", wishList.getUsername());
+        assertEquals("wishList1", wishList.getListName());
+
+        firebaseService.deleteWishList(wishList);
+    }
+
+
+    @Test
+    public void testUpdateWishList() throws ExecutionException, InterruptedException {
+        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        firebaseService.saveWishListDetails(wishList);
+        TimeUnit.SECONDS.sleep(5);
+
+        WishList wishList2 = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "cars", "item2", "image2"), new Item(10.00, "cars2", "item2", "image2")));
+
+        firebaseService.updateWishListDetails(wishList2);
+        TimeUnit.SECONDS.sleep(5);
+
+        firebaseService.deleteWishList(wishList2);
+    }
+
+    @Test
+    public void testDeleteWishList() throws ExecutionException, InterruptedException {
+        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        firebaseService.saveWishListDetails(wishList);
+
+        TimeUnit.SECONDS.sleep(5);
+
+        firebaseService.deleteWishList(wishList);
+        TimeUnit.SECONDS.sleep(5);
+
+        assertEquals(null, firebaseService.getUserDetails("test2@test.com"));
     }
 }

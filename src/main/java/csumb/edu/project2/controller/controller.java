@@ -20,8 +20,4 @@ public class controller {
         return "login";
     }
 
-    @RequestMapping("/items")
-    public String items(){
-        return "items";
-    }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,29 +13,32 @@
     <main class="form-signin">
         <h1 style="margin:25px">Welcome to LaundryList.</h1><br>
         <br>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm"></div>
-                <div class="form-floating w-25" style="padding-left:1px">
-                    <input id="floatingInput" class="form-control" type="email" placeholder="email@example.com">
-                    <label for="floatingInput"> Email Address</label>
+        <!--TODO: make decision on how this is supposed to be designed (the action) after we consult Dr.C-->
+        <form action="/createNewUser"method="post">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm"></div>
+                        <div class="form-floating w-25" style="padding-left:1px">
+                            <input name="username" id="floatingInput" class="form-control" type="email" placeholder="email@example.com" required>
+                            <label for="floatingInput">Email Address</label>
+                        </div>
+                    <div class="col-sm"></div>
                 </div>
-                <div class="col-sm"></div>
             </div>
-        </div>
-        <br>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm"></div>
-                <div class="form-floating w-25" style="padding-left:1px">
-                    <input id="floatingPassword" class="form-control" type="password" placeholder="password">
-                    <label for="floatingPassword">Password</label>
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm"></div>
+                    <div class="form-floating w-25" style="padding-left:1px">
+                        <input name="password" id="floatingPassword" class="form-control" type="password" placeholder="password" required>
+                        <label for="floatingPassword">Password</label>
+                    </div>
+                    <div class="col-sm"></div>
                 </div>
-                <div class="col-sm"></div>
             </div>
-        </div>
-        <br>
-        <button class="w-25 btn btn-lg btn-primary">Sign Up</button>
+            <br>
+            <button class="w-25 btn btn-lg btn-primary" type="submit">Sign Up</button>
+        </form>
         <p class="mt-5 mb-3 text-muted">Already have an account?</p> <a class="mt-5 mb-3 text-muted" href="/signin">Sign In</a>
     </main>
 

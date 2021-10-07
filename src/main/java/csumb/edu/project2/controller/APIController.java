@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -34,6 +35,24 @@ public class APIController {
 
         return "User added successfully.";
     }
+
+    //This is temporary as learn how this is supposed to be designed.
+    @PostMapping("/createNewUser")
+        public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+        try {
+            firebaseService.saveUserDetails(new User(username, password));
+        } catch (ExecutionException e) {
+            return null;
+        } catch (InterruptedException e) {
+            return null;
+        }
+        // Redirect code credit: https://stackoverflow.com/a/47411493
+        //TODO: Attach a cookie for persistence sake/sanity check
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/"));
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password) throws IOException{

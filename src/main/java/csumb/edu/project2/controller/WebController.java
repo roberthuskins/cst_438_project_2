@@ -41,11 +41,11 @@ public class WebController {
                     cookieValues+=";";
                 }
             }
-            //this sends all our cookies over to the APIController
+            //this appends the cookies to the request that we are about to make with req.connect()
             req.setRequestProperty("Cookie", cookieValues);
         }
         else {
-            //I would imagine you redirect to login page here;
+            //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
         }
 
 

@@ -65,7 +65,7 @@ public class APIController {
                 if(user.getUsername().equals(username) && user.getPassword().equals(password)){
                     HttpHeaders headers = new HttpHeaders();
                     headers.setLocation(URI.create("/"));
-                    //set the cookie when
+                    //set their cookies when the user calls the api/makes post request to this endpoint
                     response.addCookie(new Cookie(CookieNames.USERNAME, username));
                     response.addCookie(new Cookie(CookieNames.PASSWORD, password));
                     return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
@@ -117,7 +117,7 @@ public class APIController {
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/wishlists")
     public List<WishList> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
-        //we read the cookies through the @CookieValues
+        //we read the cookies through the @CookieValues. Note that these cookies were not passed in directly through the browser. It was the web controller that transferred the cookies through the browser to the APIController.
         System.out.println(login_username);
         System.out.println(login_password);
 

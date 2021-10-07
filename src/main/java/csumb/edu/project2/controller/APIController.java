@@ -1,6 +1,7 @@
 package csumb.edu.project2.controller;
 
 import csumb.edu.project2.firebase.FirebaseService;
+import csumb.edu.project2.objects.CookieNames;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
 import csumb.edu.project2.objects.WishList;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -55,13 +58,16 @@ public class APIController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password) throws IOException{
+    public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException{
         try {
             List<User> users = firebaseService.getAllUsers();
             for (User user: users){
                 if(user.getUsername().equals(username) && user.getPassword().equals(password)){
                     HttpHeaders headers = new HttpHeaders();
                     headers.setLocation(URI.create("/"));
+                    //set the cookie when
+                    response.addCookie(new Cookie(CookieNames.USERNAME, username));
+                    response.addCookie(new Cookie(CookieNames.PASSWORD, password));
                     return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
                 }
             }
@@ -110,7 +116,13 @@ public class APIController {
 
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/wishlists")
-    public List<WishList> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list) {
+    public List<WishList> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        //we read the cookies through the @CookieValues
+        System.out.println(login_username);
+        System.out.println(login_password);
+
+        //below this comment we will make the request to the database with the specific usernames and passwords.
+
         return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )));
     }
 

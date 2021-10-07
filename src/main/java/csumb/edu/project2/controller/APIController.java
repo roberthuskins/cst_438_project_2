@@ -1,6 +1,5 @@
 package csumb.edu.project2.controller;
 
-import ch.qos.logback.core.joran.util.beans.BeanDescriptionFactory;
 import csumb.edu.project2.firebase.FirebaseService;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
@@ -11,12 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -46,7 +42,7 @@ public class APIController {
             for (User user: users){
                 if(user.getUsername().equals(username) && user.getPassword().equals(password)){
                     HttpHeaders headers = new HttpHeaders();
-                    headers.setLocation(URI.create("/items"));
+                    headers.setLocation(URI.create("/"));
                     return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
                 }
             }

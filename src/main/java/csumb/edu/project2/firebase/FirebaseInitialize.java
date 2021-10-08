@@ -23,6 +23,8 @@ public class FirebaseInitialize {
 
         if (System.getenv("FIREBASE_TYPE") == null) {
             try {
+                System.out.println("DID WE EVEN MAKE IT HERE 1");
+
                 FileInputStream serviceAccount =
                         new FileInputStream("./laundrylist-687e2-firebase-adminsdk-staqg-86c89737bc.json");
 

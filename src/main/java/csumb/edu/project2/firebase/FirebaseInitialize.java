@@ -10,7 +10,6 @@ import org.apache.commons.io.IOUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 /***
  * This class initializes the connection to Firestore. It is run automatically because of the @PostConstruct method.
@@ -23,7 +22,6 @@ public class FirebaseInitialize {
 
         if (System.getenv("FIREBASE_TYPE") == null) {
             try {
-                System.out.println("DID WE EVEN MAKE IT HERE 1");
 
                 FileInputStream serviceAccount =
                         new FileInputStream("./laundrylist-687e2-firebase-adminsdk-staqg-86c89737bc.json");
@@ -39,7 +37,6 @@ public class FirebaseInitialize {
             }
         } else {
             try {
-                System.out.println("DID WE EVEN MAKE IT HERE");
                 FirebaseOptions options = new FirebaseOptions.Builder()
                         .setCredentials(GoogleCredentials.fromStream(createFirebaseCredential()))
                         .setDatabaseUrl("https://laundrylist-687e2-default-rtdb.firebaseio.com")

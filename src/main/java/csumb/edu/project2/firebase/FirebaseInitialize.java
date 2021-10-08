@@ -37,8 +37,7 @@ public class FirebaseInitialize {
             }
         } else {
             try {
-                FileInputStream serviceAccount =
-                        new FileInputStream("./laundrylist-687e2-firebase-adminsdk-staqg-86c89737bc.json");
+                System.out.println("DID WE EVEN MAKE IT HERE");
                 FirebaseOptions options = new FirebaseOptions.Builder()
                         .setCredentials(GoogleCredentials.fromStream(createFirebaseCredential()))
                         .setDatabaseUrl("https://laundrylist-687e2-default-rtdb.firebaseio.com")

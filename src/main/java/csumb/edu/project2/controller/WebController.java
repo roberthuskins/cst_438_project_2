@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class WebController {
     @RequestMapping("/")
     public String index(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = "http://localhost:8080/wishlists";
+        String apiURL = "/wishlists";
 
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();

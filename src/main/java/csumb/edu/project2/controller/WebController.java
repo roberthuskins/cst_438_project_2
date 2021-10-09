@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class WebController {
     @RequestMapping("/")
     public String index(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = "/wishlists";
+        String apiURL = "https://radiant-cliffs-80770.herokuapp.com/wishlists";
 
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
@@ -46,6 +46,7 @@ public class WebController {
         }
         else {
             //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
+            return "login";
         }
 
 

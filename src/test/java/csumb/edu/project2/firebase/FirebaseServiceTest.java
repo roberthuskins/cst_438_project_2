@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration test for our database. The timers are to prevent flakiness due to latency.
@@ -92,7 +93,16 @@ public class FirebaseServiceTest {
         firebaseService.updateWishListDetails(wishList2);
         TimeUnit.SECONDS.sleep(5);
 
-        firebaseService.deleteWishList(wishList2);
+        WishList wishList3 = firebaseService.getWishListDetails(wishList2.getUsername(),wishList2.getListName());
+        TimeUnit.SECONDS.sleep(5);
+
+        assertEquals(wishList3.getItems().get(0).getName(), wishList2.getItems().get(0).getName());
+        assertEquals(wishList3.getItems().get(0).getImageURL(), wishList2.getItems().get(0).getImageURL());
+        assertEquals(wishList3.getItems().get(0).getPrice(), wishList2.getItems().get(0).getPrice());
+        assertEquals(wishList3.getItems().get(0).getShopURL(), wishList2.getItems().get(0).getShopURL());
+
+
+
     }
 
     @Test
@@ -106,5 +116,34 @@ public class FirebaseServiceTest {
         TimeUnit.SECONDS.sleep(5);
 
         assertEquals(null, firebaseService.getUserDetails("test2@test.com"));
+    }
+
+    @Test
+    public void testGetAllWishLists() throws ExecutionException, InterruptedException {
+        WishList wishList = new WishList("getAllWishlists@temp.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        firebaseService.saveWishListDetails(wishList);
+        TimeUnit.SECONDS.sleep(5);
+
+        WishList wishList2 = new WishList("getAllWishlists@temp.com", "wishList2", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+
+        firebaseService.saveWishListDetails(wishList2);
+        TimeUnit.SECONDS.sleep(5);
+
+        WishList wishList3 = new WishList("getAllWishlists@temp.com", "wishList3", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        firebaseService.saveWishListDetails(wishList3);
+        TimeUnit.SECONDS.sleep(5);
+
+        List<WishList> allWishlists = firebaseService.getAllWishLists();
+        TimeUnit.SECONDS.sleep(5);
+        assertTrue(allWishlists.size() >= 3);
+
+        allWishlists= firebaseService.getAllWishLists("getAllWishlists@temp.com");
+        TimeUnit.SECONDS.sleep(5);
+
+        assertTrue(allWishlists.size() == 3);
+
+        firebaseService.deleteWishList(wishList);
+        firebaseService.deleteWishList(wishList2);
+        firebaseService.deleteWishList(wishList3);
     }
 }

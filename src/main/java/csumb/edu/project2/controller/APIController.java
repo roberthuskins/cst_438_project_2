@@ -93,8 +93,9 @@ public class APIController {
     }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
+
     @GetMapping("/items")
-    public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list) {
+    public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
         return Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods", "item1", "image1"));
     }
 

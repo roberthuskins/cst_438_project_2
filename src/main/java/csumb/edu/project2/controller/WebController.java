@@ -99,12 +99,10 @@ public class WebController {
         System.out.println("ERIKS:"+rootobj);
         ArrayList<JsonElement> listItems = new ArrayList<>();
         for(JsonElement obj: rootobj){
-            listItems.add(obj.getAsJsonObject().get("name"));
-            System.out.println(obj.getAsJsonObject().get("name"));
-
+            listItems.add(obj.getAsJsonObject());
         }
 
-        model.addAttribute("rotobj", rootobj);
+        model.addAttribute("listItems", listItems);
 
         return "items";
     }

@@ -1,5 +1,6 @@
 package csumb.edu.project2.controller;
 
+import csumb.edu.project2.Heroku.URLFetcher;
 import csumb.edu.project2.firebase.FirebaseService;
 import csumb.edu.project2.objects.CookieNames;
 import csumb.edu.project2.objects.Item;
@@ -25,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 @RestController
 public class APIController {
     @Autowired FirebaseService firebaseService;
+    @Autowired URLFetcher urlFetcher;
 
     @PutMapping("/newUser")
     public String newUser(@RequestParam String username, @RequestParam String password) {

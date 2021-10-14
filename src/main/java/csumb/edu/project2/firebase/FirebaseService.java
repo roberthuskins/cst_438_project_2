@@ -18,19 +18,26 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class FirebaseService {
 
+    /**
+     * The key for each User is just the username
+     * @param user
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public void saveUserDetails(User user) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).set(user);
     }
 
-    public void saveItemDetails(Item items) throws ExecutionException, InterruptedException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("items").document(items.getName()).set(items);
-    }
-
+    /**
+     * The key for each WishList is wishlist username + wishlist name
+     * @param wishList wishlist data model object
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public void saveWishListDetails(WishList wishList) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(wishList.getListName()).set(wishList);
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(createWishlistKey(wishList.getUsername(), wishList.getListName())).set(wishList);
     }
 
     public User getUserDetails(String name) throws ExecutionException, InterruptedException {
@@ -55,33 +62,9 @@ public class FirebaseService {
         }
     }
 
-
-    public Item getItemDetails(String name) throws ExecutionException, InterruptedException {
+    public WishList getWishListDetails(String username, String wishlistName) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference documentReference = dbFirestore.collection("items").document(name);
-        ApiFuture<DocumentSnapshot> future = documentReference.get();
-
-        DocumentSnapshot document = future. get();
-
-        Item items = null;
-
-        if(document.exists()) {
-            items = document.toObject(Item.class);
-            if (items.getName()== null || items.getImageURL() == null || items.getShopURL() == null) {
-                //If object doens't exist firebase still gives us an Object with all the fields null
-                //This if statement forces it to return a null object if the object doesn't exist
-                return null;
-            }
-            return items;
-        } else {
-            return null;
-        }
-    }
-
-    ////
-    public WishList getWishListDetails(String username, List<ArrayList> items) throws ExecutionException, InterruptedException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference documentReference = dbFirestore.collection("wishList").document(username);
+        DocumentReference documentReference = dbFirestore.collection("wishList").document(createWishlistKey(username, wishlistName));
         ApiFuture<DocumentSnapshot> future = documentReference.get();
 
         DocumentSnapshot document = future.get();
@@ -116,42 +99,17 @@ public class FirebaseService {
         return out;
     }
 
-    public List<Item> getAllItems() throws ExecutionException, InterruptedException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        CollectionReference collectionReference = dbFirestore.collection("items");
-        ApiFuture<QuerySnapshot> future = collectionReference.get();
-
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
-        List<Item> out = new ArrayList<Item>();
-        for (DocumentSnapshot document : documents) {
-            out.add(document.toObject(Item.class));
-        }
-        return out;
-    }
-
-    //for firebase save and update are the same thing
     public void updateUserDetails(User user) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).update("password", user.getPassword());
         ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("users").document(user.getUsername()).update("username", user.getUsername());
     }
 
-    //for firebase save and update are the same thing
-    public void updateItemDetails(Item items) throws ExecutionException, InterruptedException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("items").document(items.getName()).update("name", items.getName());
-        ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("items").document(items.getImageURL()).update("imageURL", items.getImageURL());
-        ApiFuture<WriteResult> collectionsApiFuture3 = dbFirestore.collection("items").document(items.getShopURL()).update("shopURL", items.getShopURL());
-//        ApiFuture<WriteResult> collectionsApiFuture4 = dbFirestore.collection("items").document(items.getPrice()).update("price", items.getPrice());
-
-    }
-
-    /////
-    //for firebase save and update are the same thing
     public void updateWishListDetails(WishList wishList) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(wishList.getListName()).update("wishList", wishList.getListName());
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(createWishlistKey(wishList.getUsername(), wishList.getListName())).update("username",  wishList.getUsername());
+        ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("wishList").document(createWishlistKey(wishList.getUsername(), wishList.getListName())).update("listName",  wishList.getListName());
+        ApiFuture<WriteResult> collectionsApiFuture3 = dbFirestore.collection("wishList").document(createWishlistKey(wishList.getUsername(), wishList.getListName())).update("items",  wishList.getItems());
     }
 
     public void deleteUser(User user) throws ExecutionException, InterruptedException {
@@ -159,16 +117,56 @@ public class FirebaseService {
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).delete();
     }
 
-    public void deleteItem(Item items) throws ExecutionException, InterruptedException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("items").document(items.getName()).delete();
-        ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("items").document(items.getImageURL()).delete();
-        ApiFuture<WriteResult> collectionsApiFuture3 = dbFirestore.collection("items").document(items.getShopURL()).delete();
-    }
-
-    ////
     public void deleteWishList(WishList wishList) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(wishList.getListName()).delete();
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(createWishlistKey(wishList.getUsername(), wishList.getListName())).delete();
+    }
+
+
+    public List<WishList> getAllWishLists() throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference collectionReference = dbFirestore.collection("wishList");
+        ApiFuture<QuerySnapshot> future = collectionReference.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        List<WishList> out = new ArrayList<WishList>();
+        for (DocumentSnapshot document : documents) {
+            out.add(document.toObject(WishList.class));
+        }
+        return out;
+    }
+
+    /**
+     * Get all wishlists that belong to a certain username;
+     * @param username
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public List<WishList> getAllWishLists(String username) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference collectionReference = dbFirestore.collection("wishList");
+
+        Query query = collectionReference.whereEqualTo("username", username);
+        ApiFuture<QuerySnapshot> future = query.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        List<WishList> out = new ArrayList<WishList>();
+        for (DocumentSnapshot document : documents) {
+            out.add(document.toObject(WishList.class));
+        }
+        return out;
+    }
+
+    /**
+     * Generate a key for a specific wishlist. The key can be used for both inserting, updating and importantly retrieving wishlists.
+     * @param username
+     * @param wishListName
+     * @return
+     */
+    public String createWishlistKey(String username, String wishListName) {
+        return username + "_u_" + wishListName + "_w";
     }
 }

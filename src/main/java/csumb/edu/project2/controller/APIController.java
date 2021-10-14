@@ -93,62 +93,26 @@ public class APIController {
     }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
-    @GetMapping("/items")
-    public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list) {
-        try {
-            List<Item> items = firebaseService.getAllItems();
-            return items;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        return null;
-//        return Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods", "item1", "image1"));
+    @GetMapping("/items")
+    public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        return Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods", "item1", "image1"));
     }
 
     //add item
     @PostMapping("/items")
     public void addItem(@RequestParam String item_name, @RequestParam Optional<String> list, @RequestParam Optional<String> url, @RequestParam Optional<String> imageurl) {
-        try {
-            firebaseService.saveItemDetails(new Item(10.0, item_name, url, imageurl ));
-        } catch (ExecutionException e) {
-            return "Execution Exception";
-        } catch (InterruptedException e) {
-            return "Interrupted Exception";
-        }
 
-        return "User added successfully.";
     }
 
     @DeleteMapping("/items")
     public String deleteItem(@RequestParam String item_name) {
-        try {
-            Item items = firebaseService.getItemDetails(item_name);
-            firebaseService.deleteItem(items);
-            return items.getName() + " has been deleted successfully.";
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return "User not deleted successfully.";
-//        return "item deleted";
+        return "item deleted";
     }
 
     @PatchMapping("/items")
-    public String updateItems(@RequestParam String item_name, @RequestParam String item_shopURL, @RequestParam String item_imageURL) {
-        try {
-            firebaseService.updateItemDetails(new Item(10.0, item_name, item_shopURL, item_imageURL));
-        } catch (ExecutionException e) {
-            return "Execution Exception";
-        } catch (InterruptedException e) {
-            return "Interrupted Exception";
-        }
-
-        return "Item edited successfully.";
+    public String updateItems(@RequestParam String item_name) {
+        return "item added";
     }
 
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
@@ -162,8 +126,6 @@ public class APIController {
 
         return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )));
     }
-
-
 
     /* Admin endpoints go below here */
 

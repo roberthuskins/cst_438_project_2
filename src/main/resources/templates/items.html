@@ -21,7 +21,7 @@
 </head>
 <body>
     <div class="">
-        <h1 style="margin:25px" class="text-center">Welcome To Your Inventory</h1><br>
+        <h1 style="margin:25px" class="text-center">Welcome To Your Items</h1>
     </div>
     <div class="container mt-5">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">New Item</button>
@@ -69,11 +69,23 @@
             </div>
         </div>
     </div>
-    <div class = "card d-flex " id = "items" >
-        <div class="card-body d-flex" id = "content"></div>
+    <!--TODO: Add the for loop logic to grab all user items and put them in a card -->
+    <div class="container">
+        <div class="d-flex justify-content-around" style="margin:25px">
+            <table>
+                <td>
+                    <tr th:each="item: ${listItems}">
+                        <p th:text="${item.get('name')}">name</p>
+                        <p th:text="${item.get('price')}">item</p>
+                        <p th:text="${item.get('shopURL')}">item</p>
+                        <p th:text="${item.get('imageURL')}">item</p>
+                    </tr>
+                <td>
+            </table>
+        </div>
     </div>
-    <script>
 
+    <script>
     </script>
 </body>
 </html>

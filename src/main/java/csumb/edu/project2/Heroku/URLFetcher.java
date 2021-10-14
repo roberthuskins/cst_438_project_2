@@ -8,7 +8,7 @@ public class URLFetcher {
 
     public URLFetcher() {
         if (System.getenv("ON_HEROKU")!= null) {
-            this.url = "https://radiant-cliff-80770.herokuapp.com";
+            this.url = "https://radiant-cliffs-80770.herokuapp.com";
         } else {
             this.url = "http://localhost:8080";
         }

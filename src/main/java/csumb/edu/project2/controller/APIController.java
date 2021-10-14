@@ -96,7 +96,7 @@ public class APIController {
 
     @GetMapping("/items")
     public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
-        return Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods", "item1", "image1"));
+        return Arrays.asList(new Item(10.00, "airpods1", "item1", "image1"), new Item(15.00, "airpods2", "item2", "image2"));
     }
 
     //add item

@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +15,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class WebController {
@@ -97,10 +98,19 @@ public class WebController {
         JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
         JsonArray rootobj = root.getAsJsonArray();
         System.out.println("ERIKS:"+rootobj);
-        ArrayList<JsonElement> listItems = new ArrayList<>();
+        ArrayList<Map<String, String>> listItems = new ArrayList<>();
+
         for(JsonElement obj: rootobj){
-            listItems.add(obj.getAsJsonObject());
+            String n, p, s, i = "";
+            n = obj.getAsJsonObject().get("name").toString().replace("\"", "");
+            p = obj.getAsJsonObject().get("price").toString().replace("\"", "");
+            s = obj.getAsJsonObject().get("shopURL").toString().replace("\"", "");
+            i = obj.getAsJsonObject().get("imageURL").toString().replace("\"", "");
+            Map<String, String> itemsInList = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
+
+            listItems.add(itemsInList);
         }
+        System.out.println(listItems);
 
         model.addAttribute("listItems", listItems);
 

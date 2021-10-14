@@ -24,8 +24,8 @@ public class WebController {
 
     @RequestMapping("/")
     public String index(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = urlFetcher.getUrl() + "/wishlists";
-        System.out.println(apiURL);
+        String apiURL = "https://radiant-cliffs-80770.herokuapp.com/wishlists";
+        System.out.println("LOOK HERE: " + apiURL);
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
 

@@ -23,6 +23,11 @@ public class FirebaseService {
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).set(user);
     }
 
+    public void saveItemDetails(Item items) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("items").document(items.getName()).set(items);
+    }
+
     public void saveWishListDetails(WishList wishList) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(wishList.getListName()).set(wishList);
@@ -45,6 +50,29 @@ public class FirebaseService {
                 return null;
             }
             return user;
+        } else {
+            return null;
+        }
+    }
+
+
+    public Item getItemDetails(String name) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        DocumentReference documentReference = dbFirestore.collection("items").document(name);
+        ApiFuture<DocumentSnapshot> future = documentReference.get();
+
+        DocumentSnapshot document = future. get();
+
+        Item items = null;
+
+        if(document.exists()) {
+            items = document.toObject(Item.class);
+            if (items.getName()== null || items.getImageURL() == null || items.getShopURL() == null) {
+                //If object doens't exist firebase still gives us an Object with all the fields null
+                //This if statement forces it to return a null object if the object doesn't exist
+                return null;
+            }
+            return items;
         } else {
             return null;
         }
@@ -109,6 +137,16 @@ public class FirebaseService {
         ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("users").document(user.getUsername()).update("username", user.getUsername());
     }
 
+    //for firebase save and update are the same thing
+    public void updateItemDetails(Item items) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("items").document(items.getName()).update("name", items.getName());
+        ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("items").document(items.getImageURL()).update("imageURL", items.getImageURL());
+        ApiFuture<WriteResult> collectionsApiFuture3 = dbFirestore.collection("items").document(items.getShopURL()).update("shopURL", items.getShopURL());
+//        ApiFuture<WriteResult> collectionsApiFuture4 = dbFirestore.collection("items").document(items.getPrice()).update("price", items.getPrice());
+
+    }
+
     /////
     //for firebase save and update are the same thing
     public void updateWishListDetails(WishList wishList) throws ExecutionException, InterruptedException {
@@ -121,10 +159,16 @@ public class FirebaseService {
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).delete();
     }
 
+    public void deleteItem(Item items) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("items").document(items.getName()).delete();
+        ApiFuture<WriteResult> collectionsApiFuture2 = dbFirestore.collection("items").document(items.getImageURL()).delete();
+        ApiFuture<WriteResult> collectionsApiFuture3 = dbFirestore.collection("items").document(items.getShopURL()).delete();
+    }
+
     ////
     public void deleteWishList(WishList wishList) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("wishList").document(wishList.getListName()).delete();
     }
-
 }

@@ -3,6 +3,8 @@ package csumb.edu.project2.controller;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import csumb.edu.project2.Heroku.URLFetcher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +20,11 @@ import java.util.ArrayList;
 
 @Controller
 public class WebController {
+    @Autowired URLFetcher urlFetcher;
+
     @RequestMapping("/")
     public String index(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = "https://radiant-cliffs-80770.herokuapp.com/wishlists";
-
+        String apiURL = urlFetcher.getUrl() + "/wishlists";
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
 

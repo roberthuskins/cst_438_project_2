@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,9 +56,11 @@ public class WebController {
         JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
         JsonArray rootobj = root.getAsJsonArray();
         System.out.println(rootobj);
-        ArrayList<JsonElement> listNames = new ArrayList<>();
+        ArrayList<String> listNames = new ArrayList<>();
         for(JsonElement obj: rootobj){
-            listNames.add(obj.getAsJsonObject().get("listName"));
+            //this removes double quotes from the string returned in the JSON response.
+            listNames.add(obj.getAsJsonObject().get("listName").toString().replace("\"", ""));
+            System.out.println(obj.getAsJsonObject().get("listName").toString());
         }
         model.addAttribute("listNames", listNames);
 

@@ -25,8 +25,10 @@ import java.util.concurrent.ExecutionException;
  */
 @RestController
 public class APIController {
-    @Autowired FirebaseService firebaseService;
-    @Autowired URLFetcher urlFetcher;
+    @Autowired
+    FirebaseService firebaseService;
+    @Autowired
+    URLFetcher urlFetcher;
 
     @PutMapping("/newUser")
     public String newUser(@RequestParam String username, @RequestParam String password) {
@@ -43,7 +45,7 @@ public class APIController {
 
     //This is temporary as learn how this is supposed to be designed.
     @PostMapping("/createNewUser")
-        public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+    public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
         try {
             firebaseService.saveUserDetails(new User(username, password));
         } catch (ExecutionException e) {
@@ -60,11 +62,11 @@ public class APIController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException{
+    public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException {
         try {
             List<User> users = firebaseService.getAllUsers();
-            for (User user: users){
-                if(user.getUsername().equals(username) && user.getPassword().equals(password)){
+            for (User user : users) {
+                if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                     HttpHeaders headers = new HttpHeaders();
                     headers.setLocation(URI.create("/"));
                     //set their cookies when the user calls the api/makes post request to this endpoint
@@ -89,15 +91,54 @@ public class APIController {
         return "logout with just username successful";
     }
 
+    //deletes the user
     @DeleteMapping("/logout")
     public String deleteUser(@RequestParam String username, @RequestParam String password) {
         return "logout with username and password (delete user) successful";
     }
 
-    //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
+    /**
+     * Creates a wishlist in our database with a blank item list to be filled by additems
+     * @param listName
+     * @param login_username
+     * @param login_password
+     * @return
+     */
+    @PostMapping("/initWishlist")
+    public String initWishlist(@RequestParam String listName, @CookieValue(value = CookieNames.USERNAME) String login_username, @CookieValue(value = CookieNames.PASSWORD) String login_password) {
+        if (!firebaseService.verifyUser(login_username, login_password)) {
+            return "Invalid Login";
+        }
+        try {
+            firebaseService.updateWishListDetails(new WishList(login_username, listName, new ArrayList<>()));
+        } catch (ExecutionException e) {
+            return "Error";
+        } catch (InterruptedException e) {
+            return "Error";
+        }
+        return "Added successfully.";
+    }
 
+    //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/items")
     public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if (login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
+            try {
+                if (search.isEmpty() && list.isEmpty()) {
+                    List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
+                    List<Item> myItems = new ArrayList<>();
+                    for (WishList x : myWishlists) {
+                        myItems.addAll(x.getItems());
+                    }
+
+                    return myItems;
+                }
+            } catch (ExecutionException e) {
+                return new ArrayList<>();
+            } catch (InterruptedException e) {
+                return new ArrayList<>();
+            }
+        }
         return Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods", "item1", "image1"));
     }
 
@@ -126,7 +167,7 @@ public class APIController {
 
         //below this comment we will make the request to the database with the specific usernames and passwords.
 
-        return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"),new Item(20.00, "galaxy buds 2", "item url","image") )));
+        return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image"))), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image"))));
     }
 
     /* Admin endpoints go below here */

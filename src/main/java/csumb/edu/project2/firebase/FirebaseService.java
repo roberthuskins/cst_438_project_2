@@ -3,11 +3,17 @@ package csumb.edu.project2.firebase;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import csumb.edu.project2.objects.CookieNames;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
 import csumb.edu.project2.objects.WishList;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -168,5 +174,25 @@ public class FirebaseService {
      */
     public String createWishlistKey(String username, String wishListName) {
         return username + "_u_" + wishListName + "_w";
+    }
+
+    public boolean verifyUser(String username, String password) {
+        try {
+            List<User> users = this.getAllUsers();
+            for (User user: users){
+                if(user.getUsername().equals(username) && user.getPassword().equals(password)){
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setLocation(URI.create("/"));
+                    //set their cookies when the user calls the api/makes post request to this endpoint
+                    return true;
+                }
+            }
+        } catch (ExecutionException e) {
+            return false;
+        } catch (InterruptedException e) {
+            return false;
+        }
+
+        return false;
     }
 }

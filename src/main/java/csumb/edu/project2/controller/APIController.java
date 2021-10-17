@@ -122,24 +122,44 @@ public class APIController {
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/items")
     public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        List<Item> myItems = new ArrayList<>();
         if (login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
             try {
+
+                //get all the wishlists for the logged in user
+                List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
+
+                //if no params, add all items for all the user's wishlists
                 if (search.isEmpty() && list.isEmpty()) {
-                    List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
-                    List<Item> myItems = new ArrayList<>();
                     for (WishList x : myWishlists) {
                         myItems.addAll(x.getItems());
                     }
+                //if the list parameter is specified, return all the items for the user's list that was specified
+                } else if (!list.isEmpty()) {
+                    for (WishList x : myWishlists) {
+                        if (x.getListName().equals(list.get())) {
+                            myItems.addAll(x.getItems());
+                        }
+                    }
 
-                    return myItems;
+                //if search parameter is specified, look for all wishlists where the search parameter is inside the wishlist name
+                } else if (!search.isEmpty()) {
+                    for (WishList x : myWishlists) {
+                        for (Item y : x.getItems()) {
+                            if (y.getName().toLowerCase().contains(search.get().toLowerCase())) {
+                                myItems.add(y);
+                            }
+                        }
+                    }
                 }
             } catch (ExecutionException e) {
-                return new ArrayList<>();
+
             } catch (InterruptedException e) {
-                return new ArrayList<>();
+
             }
         }
-        return Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods", "item1", "image1"));
+
+        return myItems;
     }
 
     //add item

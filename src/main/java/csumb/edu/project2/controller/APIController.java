@@ -30,34 +30,44 @@ public class APIController {
     @Autowired
     URLFetcher urlFetcher;
 
-    @PutMapping("/newUser")
-    public String newUser(@RequestParam String username, @RequestParam String password) {
-        try {
-            firebaseService.saveUserDetails(new User(username, password));
-        } catch (ExecutionException e) {
-            return "Execution Exception";
-        } catch (InterruptedException e) {
-            return "Interrupted Exception";
-        }
-
-        return "User added successfully.";
-    }
-
-    //This is temporary as learn how this is supposed to be designed.
     @PostMapping("/createNewUser")
-    public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+        public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+        //first we are going to check if the username exists in the DB, if so reroute them to the login page
         try {
+            if(userExists(username)){
+                HttpHeaders userExistsReroute = new HttpHeaders();
+                userExistsReroute.setLocation(URI.create("/signin"));
+                return new ResponseEntity<>(userExistsReroute, HttpStatus.MOVED_PERMANENTLY);
+            }
+            else;
             firebaseService.saveUserDetails(new User(username, password));
         } catch (ExecutionException e) {
             return null;
         } catch (InterruptedException e) {
             return null;
         }
+        //register worked correctly and user is now signed in
         // Redirect code credit: https://stackoverflow.com/a/47411493
         //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+    }
+
+    private boolean userExists(String username) {
+        try {
+            List<User> users = firebaseService.getAllUsers();
+            for (User user: users){
+                if(user.getUsername().equals(username)){
+                    return true;
+                }
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 

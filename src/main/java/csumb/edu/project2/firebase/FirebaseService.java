@@ -118,6 +118,7 @@ public class FirebaseService {
         ApiFuture<WriteResult> collectionsApiFuture3 = dbFirestore.collection("wishList").document(createWishlistKey(wishList.getUsername(), wishList.getListName())).update("items",  wishList.getItems());
     }
 
+
     public void deleteUser(User user) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("users").document(user.getUsername()).delete();

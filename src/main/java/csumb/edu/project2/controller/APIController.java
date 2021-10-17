@@ -110,7 +110,7 @@ public class APIController {
             return "Invalid Login";
         }
         try {
-            firebaseService.updateWishListDetails(new WishList(login_username, listName, new ArrayList<>()));
+            firebaseService.saveWishListDetails(new WishList(login_username, listName, new ArrayList<>()));
         } catch (ExecutionException e) {
             return "Error";
         } catch (InterruptedException e) {

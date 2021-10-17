@@ -93,8 +93,15 @@ public class APIController {
 
     //deletes the user
     @DeleteMapping("/logout")
-    public String deleteUser(@RequestParam String username, @RequestParam String password) {
-        return "logout with username and password (delete user) successful";
+    public Boolean deleteUser(@RequestParam String username, @RequestParam String password) {
+        try {
+            firebaseService.deleteUser(new User(username, password));
+        } catch (ExecutionException e) {
+            return false;
+        } catch (InterruptedException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

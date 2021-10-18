@@ -122,12 +122,18 @@ public class APIController {
      * @return
      */
     @PostMapping("/initWishlist")
-    public String initWishlist(@RequestParam String listName, @CookieValue(value = CookieNames.USERNAME) String login_username, @CookieValue(value = CookieNames.PASSWORD) String login_password) {
+    public String initWishlist(@RequestParam String listName, @CookieValue(value = CookieNames.USERNAME) String login_username, boolean isPublic, @CookieValue(value = CookieNames.PASSWORD) String login_password) {
         if (!firebaseService.verifyUser(login_username, login_password)) {
             return "Invalid Login";
         }
         try {
-            firebaseService.saveWishListDetails(new WishList(login_username, listName, new ArrayList<>()));
+            List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
+            for(WishList wishList : myWishlists){
+                if (wishList.getListName().equals(listName)){
+                    return "Cannot have two lists with the same name!";
+                }
+            }
+            firebaseService.saveWishListDetails(new WishList(login_username, listName, new ArrayList<>(), isPublic));
         } catch (ExecutionException e) {
             return "Error";
         } catch (InterruptedException e) {
@@ -204,7 +210,7 @@ public class APIController {
 
         //below this comment we will make the request to the database with the specific usernames and passwords.
 
-        return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image"))), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image"))));
+        return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image")), true), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image")), true));
     }
 
     /* Admin endpoints go below here */

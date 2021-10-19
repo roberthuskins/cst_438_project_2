@@ -113,7 +113,7 @@ public class WebController {
             s = obj.getAsJsonObject().get("shopURL").toString().replace("\"", "");
             i = obj.getAsJsonObject().get("imageURL").toString().replace("\"", "");
             Map<String, String> itemsInList = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
-
+            System.out.println("Erik List: " + itemsInList);
             listItems.add(itemsInList);
         }
 

@@ -3,21 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/styles.css}" rel="stylesheet"</link>
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
     <title>Users Items for Wish List</title>
-    <style>
-        .modal-header{
-            background: green;
-            color: white;
-        }
-        .required:after{
-            content:"*";
-            color: red;
-        }
-    </style>
+
 </head>
 <body>
     <div class="">
@@ -70,18 +62,22 @@
         </div>
     </div>
     <!--TODO: Add the for loop logic to grab all user items and put them in a card -->
-    <div class="container">
-        <div class="d-flex justify-content-around" style="margin:25px">
-            <table>
-                <td>
-                    <tr th:each="item: ${listItems}">
-                        <p th:text="${item.name}">name</p>
-                        <p th:text="${item.price}">name</p>
-                        <p th:text="${item.shopURL}">name</p>
-                        <p th:text="${item.imageURL}">name</p>
-                    </tr>
-                <td>
-            </table>
+    <div class="d-flex flex-wrap flex-row-reverse justify-content-center">
+        <div th:each="item: ${listItems}" style="margin: 0 10px">
+            <div class="card" id="shopParent">
+                <div id="shopImageParent">
+                    <img class="card-img-top" id="shopImage" th:src="${item.imageURL}" th:alt="${item.name}">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${item.name}"> name </h5>
+                    <p class="card-text" id="shopDesc" th:text="${item.shopURL}">shopURL</p>
+                    <div class="priceSection" id="priceSection">
+                        <div class="price" th:text="${item.price}">price/div>
+                        <div class= "btn btn-primary productLink"> Details </div>
+                    </div>
+                </div>
+            </div>
+            <br>
         </div>
     </div>
 

@@ -75,10 +75,10 @@ public class WebController {
 
     @RequestMapping("/myitems")
     public String items(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = "http://localhost:8080/items";
-
+        String apiURL = urlFetcher.getUrl() + "/items";
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
+
         String cookieValues = "";
         Cookie[] cookies = request.getCookies();
 

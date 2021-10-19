@@ -69,7 +69,7 @@ public class FirebaseServiceTest {
 
     @Test
     public void testInsertWishList() throws ExecutionException, InterruptedException {
-        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")),true);
         firebaseService.saveWishListDetails(wishList);
         TimeUnit.SECONDS.sleep(5);
 
@@ -93,11 +93,11 @@ public class FirebaseServiceTest {
 
     @Test
     public void testUpdateWishList() throws ExecutionException, InterruptedException {
-        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")),true);
         firebaseService.saveWishListDetails(wishList);
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList2 = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "cars", "item2", "image2"), new Item(10.00, "cars2", "item2", "image2")));
+        WishList wishList2 = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "cars", "item2", "image2"), new Item(10.00, "cars2", "item2", "image2")),true);
 
         firebaseService.updateWishListDetails(wishList2);
         TimeUnit.SECONDS.sleep(5);
@@ -118,7 +118,7 @@ public class FirebaseServiceTest {
 
     @Test
     public void testDeleteWishList() throws ExecutionException, InterruptedException {
-        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")),true);
         firebaseService.saveWishListDetails(wishList);
 
         TimeUnit.SECONDS.sleep(5);
@@ -131,16 +131,16 @@ public class FirebaseServiceTest {
 
     @Test
     public void testGetAllWishLists() throws ExecutionException, InterruptedException {
-        WishList wishList = new WishList("getAllWishlists@temp.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList = new WishList("getAllWishlists@temp.com", "wishList1", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")),true);
         firebaseService.saveWishListDetails(wishList);
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList2 = new WishList("getAllWishlists@temp.com", "wishList2", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList2 = new WishList("getAllWishlists@temp.com", "wishList2", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")),true);
 
         firebaseService.saveWishListDetails(wishList2);
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList3 = new WishList("getAllWishlists@temp.com", "wishList3", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList3 = new WishList("getAllWishlists@temp.com", "wishList3", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")),true);
         firebaseService.saveWishListDetails(wishList3);
         TimeUnit.SECONDS.sleep(5);
 

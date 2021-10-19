@@ -3,6 +3,9 @@ package csumb.edu.project2.controller;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +15,10 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -69,7 +72,7 @@ public class WebController {
 
     @RequestMapping("/myitems")
     public String items(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = "https://radiant-cliffs-80770.herokuapp.com/items";
+        String apiURL = "http://localhost:8080/items";
 
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
@@ -88,7 +91,7 @@ public class WebController {
         }
         else {
             //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
-            return "login";
+            return "redirect:/signin";
         }
 
         req.connect();
@@ -110,8 +113,8 @@ public class WebController {
 
             listItems.add(itemsInList);
         }
-        System.out.println(listItems);
 
+        System.out.println(listItems);
         model.addAttribute("listItems", listItems);
 
         return "items";

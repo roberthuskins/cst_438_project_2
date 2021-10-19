@@ -32,15 +32,14 @@ public class APIController {
     URLFetcher urlFetcher;
 
     @PostMapping("/createNewUser")
-        public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+    public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
         //first we are going to check if the username exists in the DB, if so reroute them to the login page
         try {
-            if(userExists(username)){
+            if (userExists(username)) {
                 HttpHeaders userExistsReroute = new HttpHeaders();
                 userExistsReroute.setLocation(URI.create("/signin"));
                 return new ResponseEntity<>(userExistsReroute, HttpStatus.MOVED_PERMANENTLY);
-            }
-            else;
+            } else ;
             firebaseService.saveUserDetails(new User(username, password));
         } catch (ExecutionException e) {
             return null;
@@ -58,8 +57,8 @@ public class APIController {
     private boolean userExists(String username) {
         try {
             List<User> users = firebaseService.getAllUsers();
-            for (User user: users){
-                if(user.getUsername().equals(username)){
+            for (User user : users) {
+                if (user.getUsername().equals(username)) {
                     return true;
                 }
             }
@@ -116,6 +115,7 @@ public class APIController {
 
     /**
      * Creates a wishlist in our database with a blank item list to be filled by additems
+     *
      * @param listName
      * @param login_username
      * @param login_password
@@ -128,8 +128,8 @@ public class APIController {
         }
         try {
             List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
-            for(WishList wishList : myWishlists){
-                if (wishList.getListName().equals(listName)){
+            for (WishList wishList : myWishlists) {
+                if (wishList.getListName().equals(listName)) {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
@@ -146,28 +146,31 @@ public class APIController {
     @GetMapping("/items")
     public ResponseEntity<?> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
         List<Item> myItems = new ArrayList<>();
-        if (login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
-            try {
 
-                //get all the wishlists for the logged in user
-                List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
+        try {
 
-                //if no params, add all items for all the user's wishlists
-                if (search.isEmpty() && list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        myItems.addAll(x.getItems());
-                    }
-                //if the list parameter is specified, return all the items for the user's list that was specified
-                } else if (!list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        if (x.getListName().equals(list.get())) {
-                            myItems.addAll(x.getItems());
-                        }
-                    }
+            //check login
+            if (!firebaseService.verifyUser(login_username, login_password)) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
 
-                //if search parameter is specified, look for all wishlists where the search parameter is inside the wishlist name
-                } else if (!search.isEmpty()) {
-                    for (WishList x : myWishlists) {
+            //if search and list not specified, return all items from all the user's wishlists
+            if (search.isEmpty() && list.isEmpty()) {
+                List<WishList> myWishlists = firebaseService.getAllWishlists(login_username);
+
+                for (WishList x : myWishlists) {
+                    myItems.addAll(x.getItems());
+                }
+
+                return new ResponseEntity<>(myItems, HttpStatus.OK);
+
+            }
+            //if search parameter is specified, return all items that either belong to the user/are public that match the search term
+            else if (!search.isEmpty()) {
+                List<WishList> myWishlists = firebaseService.getAllWishLists();
+
+                for (WishList x : myWishlists) {
+                    if (x.getIsPublic() || x.getUsername().equals(login_username)) {
                         for (Item y : x.getItems()) {
                             if (y.getName().toLowerCase().contains(search.get().toLowerCase())) {
                                 myItems.add(y);
@@ -175,14 +178,29 @@ public class APIController {
                         }
                     }
                 }
-            } catch (ExecutionException e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } catch (InterruptedException e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        return new ResponseEntity<>(myItems, HttpStatus.OK);
+                return new ResponseEntity<>(myItems, HttpStatus.OK);
+
+            }
+            //if list parameter is specified, return all the items from a wishlist that the user owns/is public that matches the list name
+            else if (!list.isEmpty()) {
+
+                List<WishList> myWishlists = firebaseService.getAllWishlists(list.get());
+
+                for(WishList x : myWishlists) {
+                    if (x.getIsPublic() || x.getUsername().equals(login_username)) {
+                        myItems.addAll(x.getItems());
+                    }
+                }
+                return new ResponseEntity<>(myItems, HttpStatus.OK);
+            }
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     //add item
@@ -218,36 +236,34 @@ public class APIController {
 
             //if search parameter is specified, return wishlists that are public or belong to the user that matches.
             else if (!search.isEmpty()) {
-                 List<WishList> myList = firebaseService.getAllWishLists();
+                List<WishList> myList = firebaseService.getAllWishLists();
 
-                 List<WishList> out = new ArrayList<>();
-                 for(WishList x : myList) {
-                     if (x.getListName().toLowerCase().contains(search.get().toLowerCase())) {
-                         if (x.getIsPublic() || x.getUsername().equals(login_username)) {
-                             out.add(x);
-                         }
+                List<WishList> out = new ArrayList<>();
+                for (WishList x : myList) {
+                    if (x.getListName().toLowerCase().contains(search.get().toLowerCase())) {
+                        if (x.getIsPublic() || x.getUsername().equals(login_username)) {
+                            out.add(x);
+                        }
 
-                     }
-                 }
+                    }
+                }
 
-                 return new ResponseEntity<>(out, HttpStatus.OK);
+                return new ResponseEntity<>(out, HttpStatus.OK);
 
-            //if list parameter is specified, then return all lists that match the name and are either public or belong to the user
+                //if list parameter is specified, then return all lists that match the name and are either public or belong to the user
             } else if (!list.isEmpty()) {
                 List<WishList> myList = firebaseService.getAllWishlists(list.get());
 
                 List<WishList> out = new ArrayList<>();
 
-                for(WishList x : myList) {
-                    if(x.getIsPublic() || x.getUsername().equals(login_username)) {
+                for (WishList x : myList) {
+                    if (x.getIsPublic() || x.getUsername().equals(login_username)) {
                         out.add(x);
                     }
                 }
                 return new ResponseEntity<>(out, HttpStatus.OK);
             }
-        }
-
-        catch (ExecutionException e) {
+        } catch (ExecutionException e) {
 
         } catch (InterruptedException e) {
 

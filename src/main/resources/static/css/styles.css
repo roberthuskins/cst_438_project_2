@@ -3,3 +3,32 @@
     bottom: -4x;
     right: 10px;
 }
+.modal-header{
+    background: green;
+    color: white;
+}
+.required:after{
+    content:"*";
+    color: red;
+}
+#shopParent{
+    width: 250px;
+}
+
+#shopDesc{
+    border-top: 1px solid rgba(0, 0, 0, 0.253);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+#shopImageParent{
+    height: 200px;
+    width: 350px;
+}
+
+#shopImage{
+    max-width: 70%;
+    max-height: 60%;
+}

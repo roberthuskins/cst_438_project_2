@@ -12,15 +12,25 @@ public class WishList {
     private String username;
     private String listName;
     private List<Item> items;
+    private boolean isPublic;
 
     public WishList() {
         super();
     }
 
-    public WishList(String username, String listName, List<Item> items) {
+    public WishList(String username, String listName, List<Item> items, boolean isPublic) {
         this.username = username;
         this.listName = listName;
         this.items = items;
+        this.isPublic = isPublic;
+    }
+
+    public boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 
     public String getListName() {

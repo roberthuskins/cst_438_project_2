@@ -216,24 +216,34 @@ public class APIController {
                 return new ResponseEntity<>(firebaseService.getAllWishLists(login_username), HttpStatus.OK);
             }
 
-            //if search parameter is specified, return a wishlist that is public OR that belongs to the user that matches.
+            //if search parameter is specified, return wishlists that are public or belong to the user that matches.
             else if (!search.isEmpty()) {
                  List<WishList> myList = firebaseService.getAllWishLists();
 
+                 List<WishList> out = new ArrayList<>();
                  for(WishList x : myList) {
                      if (x.getListName().toLowerCase().contains(search.get().toLowerCase())) {
                          if (x.getIsPublic() || x.getUsername().equals(login_username)) {
-                             return new ResponseEntity<>(x, HttpStatus.OK);
+                             out.add(x);
                          }
 
                      }
                  }
 
-                 //no Wishlist found with search we return just OK.
-                 return new ResponseEntity<>(HttpStatus.OK);
+                 return new ResponseEntity<>(out, HttpStatus.OK);
 
-            } else if (!search.isEmpty()) {
-                
+            //if list parameter is specified, then return all lists that match the name and are either public or belong to the user
+            } else if (!list.isEmpty()) {
+                List<WishList> myList = firebaseService.getAllWishlists(list.get());
+
+                List<WishList> out = new ArrayList<>();
+
+                for(WishList x : myList) {
+                    if(x.getIsPublic() || x.getUsername().equals(login_username)) {
+                        out.add(x);
+                    }
+                }
+                return new ResponseEntity<>(out, HttpStatus.OK);
             }
         }
 

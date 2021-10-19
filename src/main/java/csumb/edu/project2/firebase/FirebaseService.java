@@ -167,6 +167,22 @@ public class FirebaseService {
         return out;
     }
 
+    public List<WishList> getAllWishlists(String listName) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference collectionReference = dbFirestore.collection("wishList");
+
+        Query query = collectionReference.whereEqualTo("listName", listName);
+        ApiFuture<QuerySnapshot> future = query.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        List<WishList> out = new ArrayList<WishList>();
+        for (DocumentSnapshot document : documents) {
+            out.add(document.toObject(WishList.class));
+        }
+        return out;
+    }
+
     /**
      * Generate a key for a specific wishlist. The key can be used for both inserting, updating and importantly retrieving wishlists.
      * @param username

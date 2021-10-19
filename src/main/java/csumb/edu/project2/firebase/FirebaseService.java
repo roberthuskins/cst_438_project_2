@@ -167,7 +167,7 @@ public class FirebaseService {
         return out;
     }
 
-    public List<WishList> getAllWishlists(String listName) throws ExecutionException, InterruptedException {
+    public List<WishList> getAllWishlistsWithListName(String listName) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference collectionReference = dbFirestore.collection("wishList");
 

@@ -156,7 +156,7 @@ public class APIController {
 
             //if search and list not specified, return all items from all the user's wishlists
             if (search.isEmpty() && list.isEmpty()) {
-                List<WishList> myWishlists = firebaseService.getAllWishlists(login_username);
+                List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
 
                 for (WishList x : myWishlists) {
                     myItems.addAll(x.getItems());
@@ -185,7 +185,7 @@ public class APIController {
             //if list parameter is specified, return all the items from a wishlist that the user owns/is public that matches the list name
             else if (!list.isEmpty()) {
 
-                List<WishList> myWishlists = firebaseService.getAllWishlists(list.get());
+                List<WishList> myWishlists = firebaseService.getAllWishlistsWithListName(list.get());
 
                 for(WishList x : myWishlists) {
                     if (x.getIsPublic() || x.getUsername().equals(login_username)) {
@@ -221,14 +221,13 @@ public class APIController {
 
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/wishlists")
-    public ResponseEntity<?> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+    public ResponseEntity<?> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @RequestParam Optional<String> key, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
         //we read the cookies through the @CookieValues. Note that these cookies were not passed in directly through the browser. It was the web controller that transferred the cookies through the browser to the APIController.
         if (!firebaseService.verifyUser(login_username, login_password)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         try {
-
             //if no parameters, return all wishlists for a specific user.
             if (search.isEmpty() && list.isEmpty()) {
                 return new ResponseEntity<>(firebaseService.getAllWishLists(login_username), HttpStatus.OK);
@@ -252,7 +251,7 @@ public class APIController {
 
                 //if list parameter is specified, then return all lists that match the name and are either public or belong to the user
             } else if (!list.isEmpty()) {
-                List<WishList> myList = firebaseService.getAllWishlists(list.get());
+                List<WishList> myList = firebaseService.getAllWishlistsWithListName(list.get());
 
                 List<WishList> out = new ArrayList<>();
 

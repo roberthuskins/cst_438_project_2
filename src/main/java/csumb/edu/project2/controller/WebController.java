@@ -3,9 +3,9 @@ package csumb.edu.project2.controller;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import csumb.edu.project2.Heroku.URLFetcher;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,10 +23,11 @@ import java.util.Map;
 
 @Controller
 public class WebController {
+    @Autowired URLFetcher urlFetcher;
+
     @RequestMapping("/")
     public String index(Model model, HttpServletRequest request) throws IOException {
-        String apiURL = "https://radiant-cliffs-80770.herokuapp.com/wishlists";
-
+        String apiURL = urlFetcher.getUrl() + "/wishlists";
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
 
@@ -61,9 +62,11 @@ public class WebController {
         JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
         JsonArray rootobj = root.getAsJsonArray();
         System.out.println(rootobj);
-        ArrayList<JsonElement> listNames = new ArrayList<>();
+        ArrayList<String> listNames = new ArrayList<>();
         for(JsonElement obj: rootobj){
-            listNames.add(obj.getAsJsonObject().get("listName"));
+            //this removes double quotes from the string returned in the JSON response.
+            listNames.add(obj.getAsJsonObject().get("listName").toString().replace("\"", ""));
+            System.out.println(obj.getAsJsonObject().get("listName").toString());
         }
         model.addAttribute("listNames", listNames);
 

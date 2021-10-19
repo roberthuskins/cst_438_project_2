@@ -95,7 +95,6 @@ public class APIController {
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 
-
     @PostMapping("/logout")
     public String logout(@RequestParam String username) {
         return "logout with just username successful";
@@ -103,15 +102,15 @@ public class APIController {
 
     //deletes the user
     @DeleteMapping("/logout")
-    public Boolean deleteUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> deleteUser(@RequestParam String username, @RequestParam String password) {
         try {
             firebaseService.deleteUser(new User(username, password));
         } catch (ExecutionException e) {
-            return false;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return false;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return true;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
@@ -138,7 +137,7 @@ public class APIController {
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/items")
-    public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+    public ResponseEntity<?> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
         List<Item> myItems = new ArrayList<>();
         if (login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
             try {
@@ -170,13 +169,13 @@ public class APIController {
                     }
                 }
             } catch (ExecutionException e) {
-
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (InterruptedException e) {
-
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        return myItems;
+        return new ResponseEntity<>(myItems, HttpStatus.OK);
     }
 
     //add item

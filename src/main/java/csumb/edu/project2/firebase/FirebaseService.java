@@ -182,9 +182,6 @@ public class FirebaseService {
             List<User> users = this.getAllUsers();
             for (User user: users){
                 if(user.getUsername().equals(username) && user.getPassword().equals(password)){
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setLocation(URI.create("/"));
-                    //set their cookies when the user calls the api/makes post request to this endpoint
                     return true;
                 }
             }

@@ -152,8 +152,9 @@ public class APIController {
         } catch (InterruptedException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);    }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/items")
@@ -232,8 +233,10 @@ public class APIController {
                     //this is pass by reference so should work
                     x.getItems().add(myItem);
                     firebaseService.updateWishListDetails(x);
-                    return new ResponseEntity<>(HttpStatus.OK);
 
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setLocation(URI.create("/wishlist?list="+list));
+                    return new ResponseEntity<>(headers, HttpStatus.FOUND);
                 }
             }
 

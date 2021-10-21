@@ -187,28 +187,31 @@ public class APIController {
 
     //add item
     @PostMapping("/items")
-    public void addItem(@RequestParam Integer price, @RequestParam String item_name, @RequestParam String list, @RequestParam String shopURL, @RequestParam String imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
-        if(login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
-            try {
-
-                //get all the wishlists for the logged in user
-                List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
-
-                if (!list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        if (x.getListName().equals(list)) {
-                            Item item = new Item(price, item_name, shopURL, imageURL);
-                            x.getItems().add(item);
-                            firebaseService.updateWishListDetails(x);
-                        }
-                    }
-                }
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public ResponseEntity<?> addItem(@RequestParam String item_name, @RequestParam String list, @RequestParam Optional<Double> price, @RequestParam Optional<String> url, @RequestParam Optional<String> imageurl, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyUser(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+        List<WishList> myWishlists;
+        try {
+            myWishlists = firebaseService.getAllWishLists(login_username);
+
+            for(WishList x : myWishlists) {
+                if(x.getListName().equals(list)) {
+                    Item myItem = new Item(price.get(),item_name,url.get(), imageurl.get());
+                    //this is pass by reference so should work
+                    x.getItems().add(myItem);
+                    firebaseService.updateWishListDetails(x);
+                    return new ResponseEntity<>(HttpStatus.OK);
+
+                }
+            }
+
+        } catch (ExecutionException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InterruptedException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -220,19 +223,19 @@ public class APIController {
                 //get all the wishlists for the logged in user
                 List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
 
-                if (!list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        for (Item y : x.getItems()) {
-                            if ((y.getName()).equalsIgnoreCase(item_name)) {
-                                y.setPrice(price);
-//                                y.setName(item_name);
-                                y.setShopURL(shopURL);
-                                y.setImageURL(imageURL);
-                                firebaseService.updateWishListDetails(x);
-                            }
+                for (WishList x : myWishlists) {
+                    for (Item y : x.getItems()) {
+                        if ((y.getName()).equalsIgnoreCase(item_name)) {
+                            y.setPrice(price);
+                            y.setShopURL(shopURL);
+                            y.setImageURL(imageURL);
+                            firebaseService.updateWishListDetails(x);
+
+                            return;
                         }
                     }
                 }
+
             } catch (ExecutionException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -249,19 +252,19 @@ public class APIController {
                 //get all the wishlists for the logged in user
                 List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
 
-                if (!list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        for (Item y : x.getItems()) {
-                            if ((y.getName()).equalsIgnoreCase(item_name)) {
-                                x.getItems().remove(price);
-                                x.getItems().remove(item_name);
-                                x.getItems().remove(shopURL);
-                                x.getItems().remove(imageURL);
-                                firebaseService.updateWishListDetails(x);
-                            }
+                for (WishList x : myWishlists) {
+                    for (Item y : x.getItems()) {
+                        if ((y.getName()).equalsIgnoreCase(item_name)) {
+                            x.getItems().remove(price);
+                            x.getItems().remove(item_name);
+                            x.getItems().remove(shopURL);
+                            x.getItems().remove(imageURL);
+                            firebaseService.updateWishListDetails(x);
+
+                            return;
                         }
                     }
-                }
+                    }
             } catch (ExecutionException e) {
 
             } catch (InterruptedException e) {

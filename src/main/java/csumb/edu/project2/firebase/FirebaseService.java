@@ -168,6 +168,22 @@ public class FirebaseService {
         return out;
     }
 
+    public List<WishList> getAllWishlistsWithListName(String listName) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference collectionReference = dbFirestore.collection("wishList");
+
+        Query query = collectionReference.whereEqualTo("listName", listName);
+        ApiFuture<QuerySnapshot> future = query.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        List<WishList> out = new ArrayList<WishList>();
+        for (DocumentSnapshot document : documents) {
+            out.add(document.toObject(WishList.class));
+        }
+        return out;
+    }
+
     /**
      * Generate a key for a specific wishlist. The key can be used for both inserting, updating and importantly retrieving wishlists.
      * @param username
@@ -183,9 +199,6 @@ public class FirebaseService {
             List<User> users = this.getAllUsers();
             for (User user: users){
                 if(user.getUsername().equals(username) && user.getPassword().equals(password)){
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setLocation(URI.create("/"));
-                    //set their cookies when the user calls the api/makes post request to this endpoint
                     return true;
                 }
             }
@@ -196,5 +209,9 @@ public class FirebaseService {
         }
 
         return false;
+    }
+
+    public boolean verifyAdmin(String username, String password) {
+        return username.equals(CookieNames.ADMIN_USERNAME) && password.equals(CookieNames.ADMIN_PASSWORD);
     }
 }

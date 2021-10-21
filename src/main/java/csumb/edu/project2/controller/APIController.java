@@ -212,6 +212,35 @@ public class APIController {
     }
 
 
+    @PatchMapping("/items")
+    public void updateItem(@RequestParam Integer price, @RequestParam String item_name, @RequestParam String list, @RequestParam String shopURL, @RequestParam String imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+        if(login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
+            try {
+
+                //get all the wishlists for the logged in user
+                List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
+
+                if (!list.isEmpty()) {
+                    for (WishList x : myWishlists) {
+                        for (Item y : x.getItems()) {
+                            if ((y.getName()).equalsIgnoreCase(item_name)) {
+                                y.setPrice(price);
+//                                y.setName(item_name);
+                                y.setShopURL(shopURL);
+                                y.setImageURL(imageURL);
+                                firebaseService.updateWishListDetails(x);
+                            }
+                        }
+                    }
+                }
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/wishlists")

@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class WebController {
         }
         else {
             //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
-            return "login";
+            return "redirect:/";
         }
 
 
@@ -61,12 +61,10 @@ public class WebController {
         JsonParser jp = new JsonParser(); //from gson
         JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
         JsonArray rootobj = root.getAsJsonArray();
-        System.out.println(rootobj);
         ArrayList<String> listNames = new ArrayList<>();
         for(JsonElement obj: rootobj){
             //this removes double quotes from the string returned in the JSON response.
             listNames.add(obj.getAsJsonObject().get("listName").toString().replace("\"", ""));
-            System.out.println(obj.getAsJsonObject().get("listName").toString());
         }
         model.addAttribute("listNames", listNames);
 
@@ -103,7 +101,6 @@ public class WebController {
         JsonParser jp = new JsonParser(); //from gson
         JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
         JsonArray rootobj = root.getAsJsonArray();
-        System.out.println("ERIKS:"+rootobj);
         ArrayList<Map<String, String>> listItems = new ArrayList<>();
 
         for(JsonElement obj: rootobj){
@@ -113,14 +110,72 @@ public class WebController {
             s = obj.getAsJsonObject().get("shopURL").toString().replace("\"", "");
             i = obj.getAsJsonObject().get("imageURL").toString().replace("\"", "");
             Map<String, String> itemsInList = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
-            System.out.println("Erik List: " + itemsInList);
             listItems.add(itemsInList);
         }
 
-        System.out.println(listItems);
         model.addAttribute("listItems", listItems);
 
         return "items";
+    }
+
+    @RequestMapping("/wishlist")
+    public String wishlist(Model model, HttpServletRequest request, @RequestParam(value = "list") String listName) throws IOException {
+        //Sanity check never hurts anyone
+        if(listName == null){
+            return "redirect:/";
+        }
+        //if the name contains a space (ex: "baby shower") we replace the space with the necessary %20 to complete the request
+        if(listName.contains(" ")){
+            listName = listName.replaceAll(" ", "%20");
+        }
+        String apiURL = urlFetcher.getUrl() + "/wishlists?list="+listName;
+        URL url = new   URL(apiURL);
+        URLConnection req = url.openConnection();
+
+        /*
+        First we get the cookies from the request. then we append them to a string in a certain format that
+        URLConnection wants
+         */
+        String cookieValues = "";
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (int i=0; i < cookies.length; i++) {
+                cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
+
+                if (i != cookies.length -1) {
+                    cookieValues+=";";
+                }
+            }
+            //this appends the cookies to the request that we are about to make with req.connect()
+            req.setRequestProperty("Cookie", cookieValues);
+        }
+        else {
+            //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
+            return "redirect:/";
+        }
+
+
+        req.connect();
+
+        // Convert to a JSON object to print data
+        JsonParser jp = new JsonParser(); //from gson
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
+        JsonArray rootobj = root.getAsJsonArray();
+        ArrayList<Map<String,String>> itemsInList = new ArrayList<>();
+        JsonElement items = rootobj.getAsJsonArray().get(0).getAsJsonObject().get("items");
+        for(JsonElement item: items.getAsJsonArray()){
+            //this removes double quotes from the string returned in the JSON response.
+            String n, p, s, i = "";
+            n = item.getAsJsonObject().get("name").toString().replace("\"", "");
+            p = item.getAsJsonObject().get("price").toString().replace("\"", "");
+            s = item.getAsJsonObject().get("shopURL").toString().replace("\"", "");
+            i = item.getAsJsonObject().get("imageURL").toString().replace("\"", "");
+            Map<String, String> myItem = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
+            itemsInList.add(myItem);
+        }
+        model.addAttribute("itemsInList", itemsInList);
+        return "wishlist";
     }
 
     @RequestMapping("/register")

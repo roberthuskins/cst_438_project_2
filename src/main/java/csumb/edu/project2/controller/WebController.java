@@ -152,7 +152,7 @@ public class WebController {
         }
         else {
             //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
-            return "login";
+            return "redirect:/";
         }
 
 

@@ -36,48 +36,5 @@
     </div>
 </div>
 
-<div class="container mt-5">
-    <button type="button" data-bs-toggle="modal" data-bs-target="#add-item-modal" class="btn btn-primary btn-floating" id="add-wishlist">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-            <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
-        </svg>
-    </button>
-    <div class="modal" id="add-item-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create a new wishlist</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="/initWishlist" method="post">
-                        <div class="mb-3">
-                            <div class="form-floating" style="padding-left:1px">
-                                <input name="listName" id="floatingInput" class="form-control" type="text" placeholder="New Wishlist" required>
-                                <label for="floatingInput">List Name</label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">List Visibility</label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="isPublic" id="publicVisibility" value="1">
-                                <label class="form-check-label" for="publicVisibility">Public</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="isPublic" id="privateVisibility" value="0" checked>
-                                <label class="form-check-label" for="privateVisibility">Private</label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 </body>
 </html>

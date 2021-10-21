@@ -17,6 +17,15 @@
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
+<script th:inline="javascript">
+    function redirect() {
+        var page = [[${listName}]];
+        window.location.href = '/wishlist?list=' + page
+        console.log("hi")
+        return false;
+    }
+</script>
+
 <title>List Items</title>
 </head>
 <body>
@@ -69,22 +78,23 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form action=""th:action="@{/items}" method="post">
+                        <form th:action="@{/items}" method="post" th:onsubmit="return redirect()" >
+                            <input type="hidden" name="list" th:value="${listName}">
                             <div class="mb-3">
                                 <label class="form-label required">Item Name</label>
-                                <input name="name" type="text" class="form-control" required>
+                                <input name="item_name" type="text" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label required">Price</label>
-                                <input name="price" type="number" class="form-control" required>
+                                <input name="price" type="number" class="form-control" step="0.01" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label required">Shop Url</label>
-                                <input name="shopURL" type="url" class="form-control" required>
+                                <input name="url" type="url" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Image</label>
-                                <input name="imageURL" type="url" class="form-control">
+                                <input name="imageurl" type="url" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">This item will be placed in your current wishlist</label>

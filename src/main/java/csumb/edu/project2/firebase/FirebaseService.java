@@ -209,4 +209,8 @@ public class FirebaseService {
 
         return false;
     }
+
+    public boolean verifyAdmin(String username, String password) {
+        return username.equals(CookieNames.ADMIN_USERNAME) && password.equals(CookieNames.ADMIN_PASSWORD);
+    }
 }

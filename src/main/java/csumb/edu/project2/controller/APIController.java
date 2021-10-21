@@ -6,12 +6,14 @@ import csumb.edu.project2.objects.CookieNames;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
 import csumb.edu.project2.objects.WishList;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 
@@ -31,15 +33,14 @@ public class APIController {
     URLFetcher urlFetcher;
 
     @PostMapping("/createNewUser")
-        public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+    public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException {
         //first we are going to check if the username exists in the DB, if so reroute them to the login page
         try {
-            if(userExists(username)){
+            if (userExists(username)) {
                 HttpHeaders userExistsReroute = new HttpHeaders();
                 userExistsReroute.setLocation(URI.create("/signin"));
                 return new ResponseEntity<>(userExistsReroute, HttpStatus.MOVED_PERMANENTLY);
-            }
-            else;
+            } else ;
             firebaseService.saveUserDetails(new User(username, password));
         } catch (ExecutionException e) {
             return null;
@@ -51,14 +52,16 @@ public class APIController {
         //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        response.addCookie(new Cookie(CookieNames.USERNAME, username));
+        response.addCookie(new Cookie(CookieNames.PASSWORD, password));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     private boolean userExists(String username) {
         try {
             List<User> users = firebaseService.getAllUsers();
-            for (User user: users){
-                if(user.getUsername().equals(username)){
+            for (User user : users) {
+                if (user.getUsername().equals(username)) {
                     return true;
                 }
             }
@@ -92,82 +95,95 @@ public class APIController {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/signin"));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity<>(headers, HttpStatus.FORBIDDEN);
     }
 
-
     @PostMapping("/logout")
-    public String logout(@RequestParam String username) {
-        return "logout with just username successful";
+    public ResponseEntity<?> logout(HttpServletRequest req, HttpServletResponse response) {
+        //https://stackoverflow.com/questions/890935/how-do-you-remove-a-cookie-in-a-java-servlet
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null)
+            for (Cookie cookie : cookies) {
+                cookie.setValue("");
+                cookie.setPath("/");
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //deletes the user
     @DeleteMapping("/logout")
-    public Boolean deleteUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> deleteUser(@RequestParam String username, @RequestParam String password) {
         try {
             firebaseService.deleteUser(new User(username, password));
         } catch (ExecutionException e) {
-            return false;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return false;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return true;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
      * Creates a wishlist in our database with a blank item list to be filled by additems
+     *
      * @param listName
      * @param login_username
      * @param login_password
      * @return
      */
     @PostMapping("/initWishlist")
-    public String initWishlist(@RequestParam String listName, @CookieValue(value = CookieNames.USERNAME) String login_username, boolean isPublic, @CookieValue(value = CookieNames.PASSWORD) String login_password) {
+    public ResponseEntity<?> initWishlist(@RequestParam String listName, @CookieValue(value = CookieNames.USERNAME) String login_username, boolean isPublic, @CookieValue(value = CookieNames.PASSWORD) String login_password) {
         if (!firebaseService.verifyUser(login_username, login_password)) {
-            return "Invalid Login";
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         try {
             List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
-            for(WishList wishList : myWishlists){
-                if (wishList.getListName().equals(listName)){
-                    return "Cannot have two lists with the same name!";
+            for (WishList wishList : myWishlists) {
+                if (wishList.getListName().equals(listName)) {
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
             firebaseService.saveWishListDetails(new WishList(login_username, listName, new ArrayList<>(), isPublic));
         } catch (ExecutionException e) {
-            return "Error";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return "Error";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return "Added successfully.";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/items")
-    public List<Item> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+    public ResponseEntity<?> items(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
         List<Item> myItems = new ArrayList<>();
-        if (login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
-            try {
 
-                //get all the wishlists for the logged in user
+        try {
+
+            //check login
+            if (!firebaseService.verifyUser(login_username, login_password)) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            //if search and list not specified, return all items from all the user's wishlists
+            if (search.isEmpty() && list.isEmpty()) {
                 List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
 
-                //if no params, add all items for all the user's wishlists
-                if (search.isEmpty() && list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        myItems.addAll(x.getItems());
-                    }
-                //if the list parameter is specified, return all the items for the user's list that was specified
-                } else if (!list.isEmpty()) {
-                    for (WishList x : myWishlists) {
-                        if (x.getListName().equals(list.get())) {
-                            myItems.addAll(x.getItems());
-                        }
-                    }
+                for (WishList x : myWishlists) {
+                    myItems.addAll(x.getItems());
+                }
 
-                //if search parameter is specified, look for all wishlists where the search parameter is inside the wishlist name
-                } else if (!search.isEmpty()) {
-                    for (WishList x : myWishlists) {
+                return new ResponseEntity<>(myItems, HttpStatus.OK);
+
+            }
+            //if search parameter is specified, return all items that either belong to the user/are public that match the search term
+            else if (!search.isEmpty()) {
+                List<WishList> myWishlists = firebaseService.getAllWishLists();
+
+                for (WishList x : myWishlists) {
+                    if (x.getIsPublic() || x.getUsername().equals(login_username)) {
                         for (Item y : x.getItems()) {
                             if (y.getName().toLowerCase().contains(search.get().toLowerCase())) {
                                 myItems.add(y);
@@ -175,14 +191,29 @@ public class APIController {
                         }
                     }
                 }
-            } catch (ExecutionException e) {
 
-            } catch (InterruptedException e) {
+                return new ResponseEntity<>(myItems, HttpStatus.OK);
 
             }
-        }
+            //if list parameter is specified, return all the items from a wishlist that the user owns/is public that matches the list name
+            else if (!list.isEmpty()) {
 
-        return myItems;
+                List<WishList> myWishlists = firebaseService.getAllWishlistsWithListName(list.get());
+
+                for (WishList x : myWishlists) {
+                    if (x.getIsPublic() || x.getUsername().equals(login_username)) {
+                        myItems.addAll(x.getItems());
+                    }
+                }
+                return new ResponseEntity<>(myItems, HttpStatus.OK);
+            }
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     //add item
@@ -213,7 +244,6 @@ public class APIController {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
 
     @PatchMapping("/items")
     public ResponseEntity<?> updateItem(@RequestParam String item_name, @RequestParam Double price, @RequestParam String shopURL, @RequestParam String imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
@@ -246,7 +276,7 @@ public class APIController {
     }
 
     @DeleteMapping("/items")
-    public ResponseEntity<?> deleteItem(@RequestParam String item_name, @RequestParam Double price, @RequestParam String shopURL, @RequestParam String imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+    public ResponseEntity<?> deleteItem(@RequestParam String item_name, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
         if(!firebaseService.verifyUser(login_username, login_password)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -257,10 +287,10 @@ public class APIController {
             for (WishList x : myWishlists) {
                 for (Item y : x.getItems()) {
                     if ((y.getName()).equalsIgnoreCase(item_name)) {
-                        x.getItems().remove(price);
-                        x.getItems().remove(item_name);
-                        x.getItems().remove(shopURL);
-                        x.getItems().remove(imageURL);
+                        x.getItems().remove(y.getName());
+                        x.getItems().remove(y.getPrice());
+                        x.getItems().remove(y.getShopURL());
+                        x.getItems().remove(y.getImageURL());
                         firebaseService.updateWishListDetails(x);
 
                         return new ResponseEntity<>(HttpStatus.OK);
@@ -276,74 +306,129 @@ public class APIController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/wishlists")
-    public List<WishList> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+    public ResponseEntity<?> wishlists(@RequestParam Optional<String> search, @RequestParam Optional<String> list, @RequestParam Optional<String> key, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
         //we read the cookies through the @CookieValues. Note that these cookies were not passed in directly through the browser. It was the web controller that transferred the cookies through the browser to the APIController.
-        System.out.println(login_username);
-        System.out.println(login_password);
+        if (!firebaseService.verifyUser(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
-        //below this comment we will make the request to the database with the specific usernames and passwords.
+        try {
+            //if no parameters, return all wishlists for a specific user.
+            if (search.isEmpty() && list.isEmpty()) {
+                return new ResponseEntity<>(firebaseService.getAllWishLists(login_username), HttpStatus.OK);
+            }
 
-        return Arrays.asList(new WishList("guillermo@gflores.dev", "list 1", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image")), true), new WishList("guillermo@gflores.dev", "list 2", Arrays.asList(new Item(10.00, "galaxy buds", "itme url", "image"), new Item(20.00, "galaxy buds 2", "item url", "image")), true));
+            //if search parameter is specified, return wishlists that are public or belong to the user that matches.
+            else if (!search.isEmpty()) {
+                List<WishList> myList = firebaseService.getAllWishLists();
+
+                List<WishList> out = new ArrayList<>();
+                for (WishList x : myList) {
+                    if (x.getListName().toLowerCase().contains(search.get().toLowerCase())) {
+                        if (x.getIsPublic() || x.getUsername().equals(login_username)) {
+                            out.add(x);
+                        }
+
+                    }
+                }
+
+                return new ResponseEntity<>(out, HttpStatus.OK);
+
+                //if list parameter is specified, then return all lists that match the name and are either public or belong to the user
+            } else if (!list.isEmpty()) {
+                List<WishList> myList = firebaseService.getAllWishlistsWithListName(list.get());
+
+                List<WishList> out = new ArrayList<>();
+
+                for (WishList x : myList) {
+                    if (x.getIsPublic() || x.getUsername().equals(login_username)) {
+                        out.add(x);
+                    }
+                }
+                return new ResponseEntity<>(out, HttpStatus.OK);
+            }
+        } catch (ExecutionException e) {
+
+        } catch (InterruptedException e) {
+
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     /* Admin endpoints go below here */
 
     @GetMapping("/users")
-    public List<User> users() {
-        try {
-            List<User> users = firebaseService.getAllUsers();
-            return users;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public ResponseEntity<?> users(@CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return null;
+        List<User> users;
+        try {
+            users = firebaseService.getAllUsers();
+        } catch (ExecutionException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InterruptedException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PutMapping("/users")
-    public String createUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> createUser(@RequestParam String username, @RequestParam String password, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         try {
             firebaseService.saveUserDetails(new User(username, password));
         } catch (ExecutionException e) {
-            return "Execution Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return "Interrupted Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return "User added successfully.";
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @PatchMapping("/users")
-    public String updateUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> updateUser(@RequestParam String username, @RequestParam String password, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         try {
             firebaseService.updateUserDetails(new User(username, password));
         } catch (ExecutionException e) {
-            return "Execution Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return "Interrupted Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return "User edited successfully.";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/users")
-    public String deleteUser(@RequestParam String username) {
+    public ResponseEntity<?> deleteUser(@RequestParam String username, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         try {
             User myUser = firebaseService.getUserDetails(username);
             firebaseService.deleteUser(myUser);
-            return myUser.getUsername() + " has been deleted successfully.";
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return "User not deleted successfully.";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

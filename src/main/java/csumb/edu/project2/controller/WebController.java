@@ -38,10 +38,9 @@ public class WebController {
         String cookieValues = "";
         Cookie[] cookies = request.getCookies();
 
-        if (cookies != null) {
+        if (urlFetcher.checkLoginCookies(cookies)) {
             for (int i=0; i < cookies.length; i++) {
                 cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
-
                 if (i != cookies.length -1) {
                     cookieValues+=";";
                 }
@@ -51,7 +50,7 @@ public class WebController {
         }
         else {
             //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
-            return "redirect:/";
+            return "redirect:/signin";
         }
 
 
@@ -80,7 +79,7 @@ public class WebController {
         String cookieValues = "";
         Cookie[] cookies = request.getCookies();
 
-        if (cookies != null) {
+        if (urlFetcher.checkLoginCookies(cookies)) {
             for (int i=0; i < cookies.length; i++) {
                 cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
                 if (i != cookies.length -1) {
@@ -139,7 +138,7 @@ public class WebController {
         String cookieValues = "";
         Cookie[] cookies = request.getCookies();
 
-        if (cookies != null) {
+        if (urlFetcher.checkLoginCookies(cookies)) {
             for (int i=0; i < cookies.length; i++) {
                 cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
 

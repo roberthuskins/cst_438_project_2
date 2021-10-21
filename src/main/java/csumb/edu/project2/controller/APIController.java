@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 
@@ -51,7 +52,7 @@ public class APIController {
         //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     private boolean userExists(String username) {
@@ -92,12 +93,22 @@ public class APIController {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/signin"));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity<>(headers, HttpStatus.FORBIDDEN);
     }
 
     @PostMapping("/logout")
-    public String logout(@RequestParam String username) {
-        return "logout with just username successful";
+    public ResponseEntity<?> logout(HttpServletRequest req, HttpServletResponse response) {
+        //https://stackoverflow.com/questions/890935/how-do-you-remove-a-cookie-in-a-java-servlet
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null)
+            for (Cookie cookie : cookies) {
+                cookie.setValue("");
+                cookie.setPath("/");
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //deletes the user
@@ -187,7 +198,7 @@ public class APIController {
 
                 List<WishList> myWishlists = firebaseService.getAllWishlistsWithListName(list.get());
 
-                for(WishList x : myWishlists) {
+                for (WishList x : myWishlists) {
                     if (x.getIsPublic() || x.getUsername().equals(login_username)) {
                         myItems.addAll(x.getItems());
                     }
@@ -275,47 +286,64 @@ public class APIController {
     /* Admin endpoints go below here */
 
     @GetMapping("/users")
-    public List<User> users() {
-        try {
-            List<User> users = firebaseService.getAllUsers();
-            return users;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public ResponseEntity<?> users(@CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return null;
+        List<User> users;
+        try {
+            users = firebaseService.getAllUsers();
+        } catch (ExecutionException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InterruptedException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PutMapping("/users")
-    public String createUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> createUser(@RequestParam String username, @RequestParam String password, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         try {
             firebaseService.saveUserDetails(new User(username, password));
         } catch (ExecutionException e) {
-            return "Execution Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return "Interrupted Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return "User added successfully.";
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @PatchMapping("/users")
-    public String updateUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> updateUser(@RequestParam String username, @RequestParam String password, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         try {
             firebaseService.updateUserDetails(new User(username, password));
         } catch (ExecutionException e) {
-            return "Execution Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            return "Interrupted Exception";
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return "User edited successfully.";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<?> deleteUser(@RequestParam String username) {
+    public ResponseEntity<?> deleteUser(@RequestParam String username, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyAdmin(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         try {
             User myUser = firebaseService.getUserDetails(username);
             firebaseService.deleteUser(myUser);

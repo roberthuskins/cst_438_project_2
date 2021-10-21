@@ -75,7 +75,7 @@ public class FirebaseServiceTest {
 
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList2 = new WishList("test2@test.com", "wishList2", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")));
+        WishList wishList2 = new WishList("test2@test.com", "wishList2", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")), true);
         firebaseService.saveWishListDetails(wishList2);
         TimeUnit.SECONDS.sleep(5);
 
@@ -102,7 +102,7 @@ public class FirebaseServiceTest {
         firebaseService.updateWishListDetails(wishList2);
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList3 = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.50, "phone", "item2", "image2"), new Item(10.00, "cars2", "item2", "image2")));
+        WishList wishList3 = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.50, "phone", "item2", "image2"), new Item(10.00, "cars2", "item2", "image2")), true);
 
         firebaseService.updateWishListDetails(wishList3);
         TimeUnit.SECONDS.sleep(5);
@@ -128,6 +128,7 @@ public class FirebaseServiceTest {
 
         assertEquals(null, firebaseService.getUserDetails("test2@test.com"));
     }
+
 
     @Test
     public void testGetAllWishLists() throws ExecutionException, InterruptedException {

@@ -187,19 +187,31 @@ public class APIController {
 
     //add item
     @PostMapping("/items")
-    public void addItem(@RequestParam String item_name, @RequestParam Optional<String> list, @RequestParam Optional<String> url, @RequestParam Optional<String> imageurl,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+    public void addItem(@RequestParam Integer price, @RequestParam String item_name, @RequestParam String list, @RequestParam String shopURL, @RequestParam String imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+        if(login_username != null && login_password != null && firebaseService.verifyUser(login_username, login_password)) {
+            try {
 
+                //get all the wishlists for the logged in user
+                List<WishList> myWishlists = firebaseService.getAllWishLists(login_username);
+
+                if (!list.isEmpty()) {
+                    for (WishList x : myWishlists) {
+                        if (x.getListName().equals(list)) {
+                            Item item = new Item(price, item_name, shopURL, imageURL);
+                            x.getItems().add(item);
+                            firebaseService.updateWishListDetails(x);
+                        }
+                    }
+                }
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    @DeleteMapping("/items")
-    public String deleteItem(@RequestParam String item_name) {
-        return "item deleted";
-    }
 
-    @PatchMapping("/items")
-    public String updateItems(@RequestParam String item_name) {
-        return "item added";
-    }
 
     //If no params, then they should show all wish lists for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/wishlists")

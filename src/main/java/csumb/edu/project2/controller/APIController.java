@@ -216,8 +216,31 @@ public class APIController {
 
     //add item
     @PostMapping("/items")
-    public void addItem(@RequestParam String item_name, @RequestParam Optional<String> list, @RequestParam Optional<String> url, @RequestParam Optional<String> imageurl) {
+    public ResponseEntity<?> addItem(@RequestParam String item_name, @RequestParam String list, @RequestParam Optional<Double> price, @RequestParam Optional<String> url, @RequestParam Optional<String> imageurl, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "") String login_password) {
+        if(!firebaseService.verifyUser(login_username, login_password)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        List<WishList> myWishlists;
+        try {
+            myWishlists = firebaseService.getAllWishLists(login_username);
 
+            for(WishList x : myWishlists) {
+                if(x.getListName().equals(list)) {
+                    Item myItem = new Item(price.get(),item_name,url.get(), imageurl.get());
+                    //this is pass by reference so should work
+                    x.getItems().add(myItem);
+                    firebaseService.updateWishListDetails(x);
+                    return new ResponseEntity<>(HttpStatus.OK);
+
+                }
+            }
+
+        } catch (ExecutionException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InterruptedException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/items")

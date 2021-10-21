@@ -79,9 +79,12 @@ public class WebController {
         URL url = new URL(apiURL);
         URLConnection req = url.openConnection();
 
+        String apiurl_wishlist = urlFetcher.getUrl() + "/wishlists";
+        URL url_wishlist = new URL(apiurl_wishlist);
+        URLConnection req_wishlist = url_wishlist.openConnection();
+
         String cookieValues = "";
         Cookie[] cookies = request.getCookies();
-
         if (cookies != null) {
             for (int i=0; i < cookies.length; i++) {
                 cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
@@ -91,6 +94,7 @@ public class WebController {
             }
             //this appends the cookies to the request that we are about to make with req.connect()
             req.setRequestProperty("Cookie", cookieValues);
+            req_wishlist.setRequestProperty("Cookie", cookieValues);
         }
         else {
             //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
@@ -98,14 +102,25 @@ public class WebController {
         }
 
         req.connect();
+        req_wishlist.connect();
+
+        // Convert to a JSON object to print data
+        JsonParser jp_wish = new JsonParser(); //from gson
+        JsonElement root_wish = jp_wish.parse(new InputStreamReader((InputStream) req_wishlist.getContent())); //Convert the input stream to a json element
+        JsonArray rootobj_wish = root_wish.getAsJsonArray();
+        ArrayList<String> listNames = new ArrayList<>();
+        for(JsonElement obj: rootobj_wish){
+            //this removes double quotes from the string returned in the JSON response.
+            listNames.add(obj.getAsJsonObject().get("listName").toString().replace("\"", ""));
+        }
+        System.out.println("ERIK LISTNAMES: " + listNames);
+        model.addAttribute("listNames", listNames);
 
         // Convert to a JSON object to print data
         JsonParser jp = new JsonParser(); //from gson
         JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
         JsonArray rootobj = root.getAsJsonArray();
-        System.out.println("ERIKS:"+rootobj);
         ArrayList<Map<String, String>> listItems = new ArrayList<>();
-
         for(JsonElement obj: rootobj){
             String n, p, s, i = "";
             n = obj.getAsJsonObject().get("name").toString().replace("\"", "");
@@ -113,13 +128,9 @@ public class WebController {
             s = obj.getAsJsonObject().get("shopURL").toString().replace("\"", "");
             i = obj.getAsJsonObject().get("imageURL").toString().replace("\"", "");
             Map<String, String> itemsInList = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
-            System.out.println("Erik List: " + itemsInList);
             listItems.add(itemsInList);
         }
-
-        System.out.println(listItems);
         model.addAttribute("listItems", listItems);
-
         return "items";
     }
 

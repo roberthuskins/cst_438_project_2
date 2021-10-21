@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,6 +15,7 @@
     <div class="">
         <h1 style="margin:25px" class="text-center">Welcome To Your Items</h1>
     </div>
+    <!--TODO: Form to add New Item -->
     <div class="container mt-5">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">New Item</button>
         <div class="modal" id="myModal">
@@ -25,37 +26,34 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form action=""th:action="@{/items}" method="post">
                             <div class="mb-3">
                                 <label class="form-label required">Item Name</label>
-                                <input type="text" class="form-control">
+                                <input name="item_name" type="text" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label required">Price</label>
-                                <input type="text" class="form-control">
+                                <input name="price" type="text" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label required">Shop Url</label>
-                                <input type="url" class="form-control">
+                                <input name="url" type="url" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Image</label>
-                                <input type="url" class="form-control">
+                                <input name="imageurl" type="url" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Choose Laundry List</label><br>
                                 <select name="WishListItems" id="WishListItems">
-                                    <option value="Empty">Empty</option>
-                                    <option value="rigatoni">LaundryList1</option>
-                                    <option value="dave">LaundryList2</option>
-                                    <option value="pumpernickel">LaundryList3</option>
+                                    <option value="0">Select a WishList</option>
+                                    <option name="list" th:each="item: ${listNames}" value="" th:text="${item}">Empty</option>
                                 </select>
                             </div>
-                        </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-danger">Cancel</button>
                         <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -72,8 +70,7 @@
                     <h5 class="card-title" th:text="${item.name}"> name </h5>
                     <p class="card-text" id="shopDesc" th:text="${item.shopURL}">shopURL</p>
                     <div class="priceSection" id="priceSection">
-                        <div class="price" th:text="${item.price}">price/div>
-                        <div class= "btn btn-primary productLink"> Details </div>
+                        <div class="price" th:text="${item.price}">price</div>
                     </div>
                 </div>
             </div>

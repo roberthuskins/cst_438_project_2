@@ -3,14 +3,14 @@
 
 <head>
     <meta charset = "ISO-8859-1" />
-    <link href = "css/styles.css" rel = "stylesheet"/>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"</link>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
-    <title>LaundryList Home</title>
+    <title>Viewing a List</title>
 </head>
 <!-- CSS only -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -19,21 +19,86 @@
 
 <title>List Items</title>
 </head>
-<body class="text-center">
-
-<h1>Welcome to your LaundryList</h1><br>
-
-<div class="container">
-    <div class="d-flex justify-content-around" style="margin:25px">
-        <tr th:each="item : ${itemsInList}">
-        <div class="card">
-            <td th:text="${item.name}">Item Name</td>
-            <td th:text="${item.imageURL}">Item Image</td>
-            <td th:text="${item.price}">Item Price</td>
-            <td th:text="${item.shopURL}">Item URL</td>
+<body>
+<div class="text-center">
+    <br>
+    <h1>
+    Currently viewing list:
+    </h1>
+    <h1 th:text="${listName}"></h1><br>
+</div>
+<div th:switch="${isListEmpty}">
+    <div th:case="false" class="d-flex flex-wrap flex-row-reverse justify-content-center">
+        <div th:each="item: ${itemsInList}" style="margin: 0 10px">
+            <div class="card" id="shopParent">
+                <div id="shopImageParent">
+                    <img class="card-img-top" id="shopImage" th:src="${item.imageURL}" th:alt="${item.name}">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${item.name}"> name </h5>
+                    <a th:href="${item.shopURL}" target="_blank">
+                        <p class="card-text" id="shopDesc">Take me there!</p>
+                    </a>
+                    <div class="priceSection" id="priceSection">
+                        <div class="price" th:text="${item.price}">price</div>
+                    </div>
+                </div>
+            </div>
+            <br>
         </div>
-    </tr>
     </div>
+    <div th:case="true">
+        <div class="text-center">
+            <h3>There are currently no items in this list, please add one using the button below!</h3>
+        </div>
+    </div>
+
+    <br>
+    <div class="text-center">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#add-item-modal" class="btn btn-primary btn-floating" id="add-item">
+            Add a new item
+        </button>
+    </div>
+
+    <div class="container mt-5">
+        <div class="modal" id="add-item-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add a new item</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action=""th:action="@{/items}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label required">Item Name</label>
+                                <input name="name" type="text" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Price</label>
+                                <input name="price" type="number" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Shop Url</label>
+                                <input name="shopURL" type="url" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Image</label>
+                                <input name="imageURL" type="url" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">This item will be placed in your current wishlist</label>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 </body>

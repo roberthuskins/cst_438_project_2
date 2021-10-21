@@ -65,6 +65,11 @@ public class WebController {
             //this removes double quotes from the string returned in the JSON response.
             listNames.add(obj.getAsJsonObject().get("listName").toString().replace("\"", ""));
         }
+        boolean isListEmpty = true;
+        if (listNames.size()>0){
+            isListEmpty = false;
+        }
+        model.addAttribute("isListEmpty", isListEmpty);
         model.addAttribute("listNames", listNames);
 
         return "index";
@@ -179,6 +184,10 @@ public class WebController {
         JsonArray rootobj = root.getAsJsonArray();
         ArrayList<Map<String,String>> itemsInList = new ArrayList<>();
         JsonElement items = rootobj.getAsJsonArray().get(0).getAsJsonObject().get("items");
+        //grabs the name of the list, so we can display it
+        String currentListName = rootobj.getAsJsonArray().get(0).getAsJsonObject().get("listName").toString();
+        //removes quotes
+        currentListName = currentListName.replace("\"","");
         for(JsonElement item: items.getAsJsonArray()){
             //this removes double quotes from the string returned in the JSON response.
             String n, p, s, i = "";
@@ -189,7 +198,13 @@ public class WebController {
             Map<String, String> myItem = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
             itemsInList.add(myItem);
         }
+        boolean isListEmpty = true;
+        if (itemsInList.size() > 0){
+            isListEmpty = false;
+        }
+        model.addAttribute("isListEmpty", isListEmpty);
         model.addAttribute("itemsInList", itemsInList);
+        model.addAttribute("listName", currentListName);
         return "wishlist";
     }
 

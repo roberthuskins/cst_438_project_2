@@ -33,7 +33,7 @@ public class APIController {
     URLFetcher urlFetcher;
 
     @PostMapping("/createNewUser")
-    public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password) throws IOException {
+    public ResponseEntity<Object> createNewUser(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException {
         //first we are going to check if the username exists in the DB, if so reroute them to the login page
         try {
             if (userExists(username)) {
@@ -52,7 +52,9 @@ public class APIController {
         //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        response.addCookie(new Cookie(CookieNames.USERNAME, username));
+        response.addCookie(new Cookie(CookieNames.PASSWORD, password));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     private boolean userExists(String username) {

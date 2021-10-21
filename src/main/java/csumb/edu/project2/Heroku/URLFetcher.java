@@ -1,6 +1,9 @@
 package csumb.edu.project2.Heroku;
 
+import csumb.edu.project2.objects.CookieNames;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.Cookie;
 
 @Service
 public class URLFetcher {
@@ -16,5 +19,22 @@ public class URLFetcher {
 
     public String getUrl() {
         return this.url;
+    }
+
+    public boolean checkLoginCookies(Cookie[] cookies){
+        if (cookies == null){
+            return false;
+        }
+        boolean hasUsername = false;
+        boolean hasPassword = false;
+        for (Cookie cookie : cookies){
+            if (cookie.getName().equals(CookieNames.USERNAME)){
+                hasUsername =  true;
+            }
+            if (cookie.getName().equals(CookieNames.PASSWORD)){
+                hasPassword = true;
+            }
+        }
+        return hasPassword && hasUsername;
     }
 }

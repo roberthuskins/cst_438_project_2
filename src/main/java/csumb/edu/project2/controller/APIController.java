@@ -280,8 +280,8 @@ public class APIController {
         }
 
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
     }
+
 
     /* Admin endpoints go below here */
 

@@ -265,7 +265,7 @@ public class APIController {
     }
 
     @PatchMapping("/items")
-    public ResponseEntity<?> updateItem(@RequestParam String item_name, @RequestParam Double price, @RequestParam String shopURL, @RequestParam String imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+    public ResponseEntity<?> updateItem(@RequestParam String item_name, @RequestParam String list_name, @RequestParam Optional<Double> price, @RequestParam Optional<String> shopURL, @RequestParam Optional<String> imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
         if(!firebaseService.verifyUser(login_username, login_password)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -274,18 +274,29 @@ public class APIController {
             myWishlists = firebaseService.getAllWishLists(login_username);
 
             for (WishList x : myWishlists) {
-                for (Item y : x.getItems()) {
-                    if ((y.getName()).equalsIgnoreCase(item_name)) {
-                        y.setPrice(price);
-                        y.setShopURL(shopURL);
-                        y.setImageURL(imageURL);
-                        firebaseService.updateWishListDetails(x);
+                if (x.getListName().equals(list_name)) {
+                    for (Item y : x.getItems()) {
+                        if ((y.getName()).equalsIgnoreCase(item_name)) {
 
-                        return new ResponseEntity<>(HttpStatus.OK);
+                            if (price.isPresent()) {
+                                y.setPrice(price.get());
+                            }
+
+                            if (shopURL.isPresent()) {
+                                y.setShopURL(shopURL.get());
+                            }
+
+                            if (imageURL.isPresent()) {
+                                y.setImageURL(imageURL.get());
+                            }
+                            
+                            firebaseService.updateWishListDetails(x);
+
+                            return new ResponseEntity<>(HttpStatus.OK);
+                        }
                     }
                 }
             }
-
         } catch (ExecutionException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
@@ -295,7 +306,7 @@ public class APIController {
     }
 
     @DeleteMapping("/items")
-    public ResponseEntity<?> deleteItem(@RequestParam String item_name, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+    public ResponseEntity<?> deleteItem(@RequestParam String item_name, @RequestParam String list_name, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
         if(!firebaseService.verifyUser(login_username, login_password)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -304,15 +315,14 @@ public class APIController {
             myWishlists = firebaseService.getAllWishLists(login_username);
 
             for (WishList x : myWishlists) {
-                for (Item y : x.getItems()) {
-                    if ((y.getName()).equalsIgnoreCase(item_name)) {
-                        x.getItems().remove(y.getName());
-                        x.getItems().remove(y.getPrice());
-                        x.getItems().remove(y.getShopURL());
-                        x.getItems().remove(y.getImageURL());
-                        firebaseService.updateWishListDetails(x);
+                if(x.getListName().equalsIgnoreCase(list_name)) {
+                    for(int i = 0; i < x.getItems().size(); i++) {
+                        if (x.getItems().get(i).getName().equalsIgnoreCase(item_name)) {
+                            x.getItems().remove(i);
+                            firebaseService.updateWishListDetails(x);
+                            return new ResponseEntity<>(HttpStatus.OK);
 
-                        return new ResponseEntity<>(HttpStatus.OK);
+                        }
                     }
                 }
             }

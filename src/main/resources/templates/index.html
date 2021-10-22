@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-    <html xmlns:th="http://www.w3.org/1999/xhtml">
+    <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
     <head>
         <meta charset = "ISO-8859-1" />
-        <link th:href="@{/css/styles.css}" rel="stylesheet"</link>
+        <link th:href="@{/css/styles.css}" rel="stylesheet"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- CSS only -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -11,18 +11,37 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
         <title>LaundryList Home</title>
+        <nav class="navbar sticky-top navbar-dark bg-dark navbar-expand-lg">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true">
+                        View More
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/myitems">View My Items</a>
+                        <form method="post" action="/logout">
+                            <div>
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-inline ms-auto"  action="/wishlist?=(list=${listToSearch})">
+                <div class="input-group">
+                    <input class="form-control mr-sm-2" name="listToSearch" type="search" placeholder="Search lists by name..." aria-label="Search">
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+                </div>
+            </form>
+        </nav>
     </head>
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
-    <title>LaundryList Home</title>
-    </head>
         <body class="text-center">
 
         <h1>Welcome to your LaundryList</h1><br>
-        <input class="form-control" type="text" placeholder="Search" aria-label="Search">
 
         <div th:switch="${isListEmpty}">
             <div th:case="false" class="container">
@@ -85,6 +104,5 @@
                 </div>
             </div>
         </div>
-
     </body>
 </html>

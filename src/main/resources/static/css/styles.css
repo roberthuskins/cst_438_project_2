@@ -3,6 +3,11 @@
     bottom: -4x;
     right: 10px;
 }
+#add-items {
+    position: fixed;
+    bottom: -4x;
+    right: 10px;
+}
 .modal-header{
     background: green;
     color: white;

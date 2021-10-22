@@ -49,7 +49,6 @@ public class APIController {
         }
         //register worked correctly and user is now signed in
         // Redirect code credit: https://stackoverflow.com/a/47411493
-        //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
         response.addCookie(new Cookie(CookieNames.USERNAME, username));
@@ -109,8 +108,9 @@ public class APIController {
                 cookie.setMaxAge(0);
                 response.addCookie(cookie);
             }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/signin"));
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 
     //deletes the user
@@ -154,7 +154,8 @@ public class APIController {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);    }
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
     @GetMapping("/items")

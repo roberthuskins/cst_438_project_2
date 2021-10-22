@@ -49,7 +49,6 @@ public class APIController {
         }
         //register worked correctly and user is now signed in
         // Redirect code credit: https://stackoverflow.com/a/47411493
-        //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
         response.addCookie(new Cookie(CookieNames.USERNAME, username));
@@ -153,7 +152,9 @@ public class APIController {
         } catch (InterruptedException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.

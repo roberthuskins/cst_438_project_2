@@ -49,7 +49,6 @@ public class APIController {
         }
         //register worked correctly and user is now signed in
         // Redirect code credit: https://stackoverflow.com/a/47411493
-        //TODO: Attach a cookie for persistence sake/sanity check
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/"));
         response.addCookie(new Cookie(CookieNames.USERNAME, username));
@@ -78,6 +77,15 @@ public class APIController {
     public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException {
         try {
             List<User> users = firebaseService.getAllUsers();
+            System.out.println("ERIK ADMIN: " + username + " " + password);
+            if(firebaseService.verifyAdmin(username, password)) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setLocation(URI.create("/administrator"));
+                //set their cookies when the user calls the api/makes post request to this endpoint
+                response.addCookie(new Cookie(CookieNames.USERNAME, username));
+                response.addCookie(new Cookie(CookieNames.PASSWORD, password));
+                return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+            }
             for (User user : users) {
                 if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                     HttpHeaders headers = new HttpHeaders();
@@ -109,8 +117,9 @@ public class APIController {
                 cookie.setMaxAge(0);
                 response.addCookie(cookie);
             }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/signin"));
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 
     //deletes the user
@@ -152,7 +161,9 @@ public class APIController {
         } catch (InterruptedException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     //If no params, then they should show all items for a specific user that is logged in. If search it should search the db. if list it will return all the items in said wishlist.
@@ -228,12 +239,20 @@ public class APIController {
 
             for(WishList x : myWishlists) {
                 if(x.getListName().equals(list)) {
+                    if(imageurl.get().equals("")){
+                        imageurl = Optional.of("https://calgarylegacy.ca/wp-content/uploads/2020/02/480px-No_image_available.svg_.png");
+                    }
                     Item myItem = new Item(price.get(),item_name,url.get(), imageurl.get());
                     //this is pass by reference so should work
                     x.getItems().add(myItem);
                     firebaseService.updateWishListDetails(x);
-                    return new ResponseEntity<>(HttpStatus.OK);
 
+                    HttpHeaders headers = new HttpHeaders();
+                    if(list.contains(" ")){
+                        list = list.replaceAll(" ", "%20");
+                    }
+                    headers.setLocation(URI.create("/wishlist?list="+list));
+                    return new ResponseEntity<>(headers, HttpStatus.FOUND);
                 }
             }
 
@@ -393,7 +412,9 @@ public class APIController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/administrator"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
 
     }
 
@@ -411,7 +432,9 @@ public class APIController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/administrator"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @DeleteMapping("/users")
@@ -421,6 +444,11 @@ public class APIController {
         }
 
         try {
+            //Deleting user: delete user and wishlist
+            List <WishList> myWishlist = firebaseService.getAllWishLists(username);
+            for (WishList x: myWishlist){
+                firebaseService.deleteWishList(x);
+            }
             User myUser = firebaseService.getUserDetails(username);
             firebaseService.deleteUser(myUser);
         } catch (ExecutionException e) {
@@ -428,7 +456,9 @@ public class APIController {
         } catch (InterruptedException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/administrator"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
 }

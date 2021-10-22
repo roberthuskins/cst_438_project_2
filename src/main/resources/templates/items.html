@@ -3,61 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link th:href="@{/css/styles.css}" rel="stylesheet"</link>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+
+    <title>Users Items for Wish List</title>
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-    <title>Users Items for Wish List</title>
 
+    <title>Items</title>
+    <nav class="navbar sticky-top navbar-dark bg-dark navbar-expand-lg">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true">
+                    View More
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/myitems">View My Items</a>
+                    <form method="post" action="/logout">
+                        <div>
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </div>
+                    </form>
+                </div>
+            </li>
+        </ul>
+        <form class="form-inline ms-auto"  action="/wishlist?=(list=${listToSearch})">
+            <div class="input-group">
+                <input class="form-control mr-sm-2" name="listToSearch" type="search" placeholder="Search lists by name..." aria-label="Search">
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+            </div>
+        </form>
+    </nav>
 </head>
 <body>
-    <div class="">
+    <div>
         <h1 style="margin:25px" class="text-center">Welcome To Your Items</h1>
-    </div>
-    <!--TODO: Form to add New Item -->
-    <div class="container mt-5">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">New Item</button>
-        <div class="modal" id="myModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Adding New Items</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form action=""th:action="@{/items}" method="post">
-                            <div class="mb-3">
-                                <label class="form-label required">Item Name</label>
-                                <input name="item_name" type="text" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label required">Price</label>
-                                <input name="price" type="text" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label required">Shop Url</label>
-                                <input name="url" type="url" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Image</label>
-                                <input name="imageurl" type="url" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Choose Laundry List</label><br>
-                                <select name="WishListItems" id="WishListItems">
-                                    <option value="0">Select a WishList</option>
-                                    <option name="list" th:each="item: ${listNames}" value="" th:text="${item}">Empty</option>
-                                </select>
-                            </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <!--TODO: Add the for loop logic to grab all user items and put them in a card -->
     <div class="d-flex flex-wrap flex-row-reverse justify-content-center">
@@ -77,8 +61,49 @@
             <br>
         </div>
     </div>
-
-    <script>
-    </script>
+    <!--Modal Code-->
+    <div class="container mt-5">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="add-items">New Item</button>
+        <div class="modal" id="myModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Adding New Items</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action=""th:action="@{/items}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label required">Item Name</label>
+                                <input name="item_name" type="text" class="form-control required">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Price</label>
+                                <input name="price" type="text" class="form-control required" >
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Shop Url</label>
+                                <input name="url" type="url" class="form-control required">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required" >Image</label>
+                                <input name="imageurl" type="url" class="form-control required">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Choose Laundry List</label><br>
+                                <select name="WishListItems" id="WishListItems" class="required">
+                                    <option value="0">Select a WishList</option>
+                                    <option name="list" th:each="item: ${listNames}" value="" th:text="${item}">Empty</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

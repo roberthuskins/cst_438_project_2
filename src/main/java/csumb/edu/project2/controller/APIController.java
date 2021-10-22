@@ -289,7 +289,7 @@ public class APIController {
                             if (imageURL.isPresent()) {
                                 y.setImageURL(imageURL.get());
                             }
-                            
+
                             firebaseService.updateWishListDetails(x);
 
                             return new ResponseEntity<>(HttpStatus.OK);

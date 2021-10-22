@@ -229,12 +229,18 @@ public class APIController {
 
             for(WishList x : myWishlists) {
                 if(x.getListName().equals(list)) {
+                    if(imageurl.get().equals("")){
+                        imageurl = Optional.of("https://calgarylegacy.ca/wp-content/uploads/2020/02/480px-No_image_available.svg_.png");
+                    }
                     Item myItem = new Item(price.get(),item_name,url.get(), imageurl.get());
                     //this is pass by reference so should work
                     x.getItems().add(myItem);
                     firebaseService.updateWishListDetails(x);
 
                     HttpHeaders headers = new HttpHeaders();
+                    if(list.contains(" ")){
+                        list = list.replaceAll(" ", "%20");
+                    }
                     headers.setLocation(URI.create("/wishlist?list="+list));
                     return new ResponseEntity<>(headers, HttpStatus.FOUND);
                 }

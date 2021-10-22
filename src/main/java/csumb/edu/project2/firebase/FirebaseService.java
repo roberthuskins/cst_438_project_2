@@ -141,7 +141,6 @@ public class FirebaseService {
         for (DocumentSnapshot document : documents) {
             out.add(document.toObject(WishList.class));
         }
-
         return out;
     }
 

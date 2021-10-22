@@ -73,19 +73,10 @@ public class FirebaseServiceTest {
 
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList2 = new WishList("test2@test.com", "wishList2", Arrays.asList(new Item(10.00, "airpods", "item1", "image1"), new Item(10.00, "airpods2", "item4", "image4")), true);
-        firebaseService.saveWishListDetails(wishList2);
-        TimeUnit.SECONDS.sleep(5);
-
         assertEquals("test2@test.com", wishList.getUsername());
         assertEquals("wishList1", wishList.getListName());
 
-
-        assertEquals("test2@test.com", wishList2.getUsername());
-        assertEquals("wishList2", wishList2.getListName());
-
         firebaseService.deleteWishList(wishList);
-        firebaseService.deleteWishList(wishList2);
     }
 
 
@@ -100,18 +91,16 @@ public class FirebaseServiceTest {
         firebaseService.updateWishListDetails(wishList2);
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList3 = new WishList("test2@test.com", "wishList1", Arrays.asList(new Item(10.50, "phone", "item2", "image2"), new Item(10.00, "cars2", "item2", "image2")), true);
-
-        firebaseService.updateWishListDetails(wishList3);
+        WishList wishList3 = firebaseService.getWishListDetails(wishList2.getUsername(),wishList2.getListName());
         TimeUnit.SECONDS.sleep(5);
 
-        WishList wishList4 = firebaseService.getWishListDetails(wishList3.getUsername(),wishList3.getListName());
-        TimeUnit.SECONDS.sleep(5);
+        assertEquals(wishList3.getItems().get(0).getName(), wishList2.getItems().get(0).getName());
+        assertEquals(wishList3.getItems().get(0).getImageURL(), wishList2.getItems().get(0).getImageURL());
+        assertEquals(wishList3.getItems().get(0).getPrice(), wishList2.getItems().get(0).getPrice());
+        assertEquals(wishList3.getItems().get(0).getShopURL(), wishList2.getItems().get(0).getShopURL());
 
-        assertEquals(wishList4.getItems().get(0).getName(), wishList3.getItems().get(0).getName());
-        assertEquals(wishList4.getItems().get(0).getImageURL(), wishList3.getItems().get(0).getImageURL());
-        assertEquals(wishList4.getItems().get(0).getPrice(), wishList3.getItems().get(0).getPrice());
-        assertEquals(wishList4.getItems().get(0).getShopURL(), wishList3.getItems().get(0).getShopURL());
+
+
     }
 
     @Test
@@ -126,7 +115,6 @@ public class FirebaseServiceTest {
 
         assertEquals(null, firebaseService.getUserDetails("test2@test.com"));
     }
-
 
     @Test
     public void testGetAllWishLists() throws ExecutionException, InterruptedException {

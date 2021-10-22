@@ -88,22 +88,23 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form action=""th:action="@{/items}" method="post">
+                        <form th:action="@{/items}" method="post" >
+                            <input type="hidden" name="list" th:value="${listName}">
                             <div class="mb-3">
                                 <label class="form-label required">Item Name</label>
-                                <input name="name" type="text" class="form-control" required>
+                                <input name="item_name" type="text" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label required">Price</label>
-                                <input name="price" type="number" class="form-control" required>
+                                <input name="price" type="number" class="form-control" step="0.01" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label required">Shop Url</label>
-                                <input name="shopURL" type="url" class="form-control" required>
+                                <input name="url" type="url" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Image</label>
-                                <input name="imageURL" type="url" class="form-control">
+                                <input name="imageurl" type="url" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">This item will be placed in your current wishlist</label>

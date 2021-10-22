@@ -109,8 +109,9 @@ public class APIController {
                 cookie.setMaxAge(0);
                 response.addCookie(cookie);
             }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/signin"));
+        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }
 
     //deletes the user

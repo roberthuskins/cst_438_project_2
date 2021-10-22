@@ -32,13 +32,17 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/myitems">View My Items</a>
-                        <a class="dropdown-item" href="/logout">Logout</a>
+                        <form method="post" action="/logout">
+                            <div>
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </div>
+                        </form>
                     </div>
                 </li>
             </ul>
-            <form class="form-inline ms-auto"  action="/wishlist?=(list=${list})">
+            <form class="form-inline ms-auto"  action="/wishlist?=(list=${listToSearch})">
                 <div class="input-group">
-                    <input class="form-control mr-sm-2" name="list" type="search" placeholder="Search lists by name..." aria-label="Search">
+                    <input class="form-control mr-sm-2" name="listToSearch" type="search" placeholder="Search lists by name..." aria-label="Search">
                     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
                 </div>
             </form>

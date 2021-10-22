@@ -76,6 +76,15 @@ public class APIController {
     public ResponseEntity<Object> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException {
         try {
             List<User> users = firebaseService.getAllUsers();
+            System.out.println("ERIK ADMIN: " + username + " " + password);
+            if(firebaseService.verifyAdmin(username, password)) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setLocation(URI.create("/administrator"));
+                //set their cookies when the user calls the api/makes post request to this endpoint
+                response.addCookie(new Cookie(CookieNames.USERNAME, username));
+                response.addCookie(new Cookie(CookieNames.PASSWORD, password));
+                return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+            }
             for (User user : users) {
                 if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                     HttpHeaders headers = new HttpHeaders();
@@ -317,7 +326,9 @@ public class APIController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/administrator"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
 
     }
 
@@ -335,7 +346,9 @@ public class APIController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/administrator"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @DeleteMapping("/users")
@@ -345,6 +358,11 @@ public class APIController {
         }
 
         try {
+            //Deleting user: delete user and wishlist
+            List <WishList> myWishlist = firebaseService.getAllWishLists(username);
+            for (WishList x: myWishlist){
+                firebaseService.deleteWishList(x);
+            }
             User myUser = firebaseService.getUserDetails(username);
             firebaseService.deleteUser(myUser);
         } catch (ExecutionException e) {
@@ -352,7 +370,9 @@ public class APIController {
         } catch (InterruptedException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/administrator"));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
 }

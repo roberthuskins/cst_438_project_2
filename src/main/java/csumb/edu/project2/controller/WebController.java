@@ -192,6 +192,50 @@ public class WebController {
         model.addAttribute("itemsInList", itemsInList);
         return "wishlist";
     }
+    @RequestMapping("/administrator")
+    public String admin(Model model, HttpServletRequest request) throws IOException {
+
+        String apiURL = urlFetcher.getUrl() + "/users";
+        URL url = new URL(apiURL);
+        URLConnection req = url.openConnection();
+
+        String cookieValues = "";
+        Cookie[] cookies = request.getCookies();
+
+        if (urlFetcher.checkLoginCookies(cookies)) {
+            for (int i=0; i < cookies.length; i++) {
+                cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
+                if (i != cookies.length -1) {
+                    cookieValues+=";";
+                }
+            }
+            //this appends the cookies to the request that we are about to make with req.connect()
+            req.setRequestProperty("Cookie", cookieValues);
+        }
+        else {
+            //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
+            return "redirect:/signin";
+        }
+
+        req.connect();
+        // Convert to a JSON object to print data
+        JsonParser jp = new JsonParser(); //from gson
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
+        JsonArray rootobj = root.getAsJsonArray();
+        ArrayList<Map<String, String>> listUsers = new ArrayList<>();
+        for(JsonElement obj: rootobj){
+            String n, p = "";
+            n = obj.getAsJsonObject().get("username").toString().replace("\"", "");
+            p = obj.getAsJsonObject().get("password").toString().replace("\"", "");
+            if(n.equals("ADMIN@ADMIN.COM") && p.equals("ADMIN")){
+                continue;
+            }
+            Map<String, String> itemsInList = Map.of("username", n, "password", p);
+            listUsers.add(itemsInList);
+        }
+        model.addAttribute("listUsers", listUsers);
+        return "admin";
+    }
 
     @RequestMapping("/register")
     public String register(){

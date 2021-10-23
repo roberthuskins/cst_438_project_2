@@ -57,3 +57,28 @@
     margin-left: 5%;
 
 }
+.bodyy {
+    animation-name: backgroundColorPalette;
+    animation-duration: 15s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: linear;
+    /* linear is enabled default, it’s not necessary to add it make it work but it can make your code more expressive */
+}
+@keyframes backgroundColorPalette {
+    0% {
+        background: #02aab0;
+    }
+    100% {
+        background: #00cdac;
+    }
+}
+#pageHeaders{
+    background-color: rgba(255, 255, 255, 0.75);
+    font-weight: bold;
+    font-size: 72px;
+    text-align: center;
+    color: rgb(0, 0, 0);
+    border-radius: 25px;
+    margin:25px;
+}

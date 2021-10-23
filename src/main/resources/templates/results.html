@@ -39,28 +39,28 @@
     </nav>
 </head>
 
-<body class="text-center">
-
-<h1>Search Results</h1><br>
-
-<div th:switch="${isListEmpty}">
-    <div th:case="false" class="container">
-        <div class="d-flex justify-content-around" style="margin:25px">
-            <tr th:each="listName : ${listNames}">
-                <a th:href="@{/wishlist(list=${listName})}">
-                    <div class="card">
-                        <td th:text="${listName}">List Name</td>
-                    </div>
-                </a>
-            </tr>
+<body class="bodyy">
+<div class="text-center">
+    <h1>Search results</h1><br>
+    <h3>NOTE: You cannot add items to lists that do not belong to you!</h3>
+    <div th:switch="${isListEmpty}">
+        <div th:case="false" class="container">
+            <div class="d-flex flex-wrap flex-row-reverse justify-content-center" style="margin:25px;">
+                <tr th:each="listName : ${listNames}">
+                    <a th:href="@{/wishlist(list=${listName})}" style="text-decoration:none; color:black;">
+                        <div class="card p-4 m-3 shadow-lg">
+                            <td th:text="${listName}">List Name</td>
+                        </div>
+                    </a>
+                </tr>
+            </div>
+        </div>
+        <div th:case="true">
+            <div class="text-center">
+                <h3>No lists matched your query, try again.</h3>
+            </div>
         </div>
     </div>
-    <div th:case="true">
-        <div class="text-center">
-            <h3>No search results matched your query, try again.</h3>
-        </div>
-    </div>
-</div>
 
 </div>
 </body>

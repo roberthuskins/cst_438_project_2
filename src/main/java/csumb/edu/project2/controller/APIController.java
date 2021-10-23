@@ -103,7 +103,7 @@ public class APIController {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/signin"));
-        return new ResponseEntity<>(headers, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     @PostMapping("/logout")
@@ -299,6 +299,9 @@ public class APIController {
 
                             firebaseService.updateWishListDetails(x);
                             HttpHeaders headers = new HttpHeaders();
+                            if(list_name.contains(" ")){
+                                list_name = list_name.replaceAll(" ", "%20");
+                            }
                             headers.setLocation(URI.create("/wishlist?list="+list_name));
                             return new ResponseEntity<>(headers, HttpStatus.FOUND);
                         }
@@ -330,6 +333,9 @@ public class APIController {
                             firebaseService.updateWishListDetails(x);
                             firebaseService.updateWishListDetails(x);
                             HttpHeaders headers = new HttpHeaders();
+                            if(list_name.contains(" ")){
+                                list_name = list_name.replaceAll(" ", "%20");
+                            }
                             headers.setLocation(URI.create("/wishlist?list="+list_name));
                             return new ResponseEntity<>(headers, HttpStatus.FOUND);
 

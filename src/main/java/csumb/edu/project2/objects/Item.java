@@ -21,6 +21,17 @@ public class Item {
         this.imageURL = imageURL;
     }
 
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "price=" + price +
+                ", name='" + name + '\'' +
+                ", shopURL='" + shopURL + '\'' +
+                ", imageURL='" + imageURL + '\'' +
+                '}';
+    }
+
     public double getPrice() {
         return price;
     }

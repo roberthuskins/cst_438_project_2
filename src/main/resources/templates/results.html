@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
 
-    <title>Users Items for Wish List</title>
+<head>
+    <meta charset = "ISO-8859-1" />
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
-    <title>Items</title>
+    <title>LaundryList Home</title>
     <nav class="navbar sticky-top navbar-dark bg-dark navbar-expand-lg">
         <ul class="navbar-nav">
             <li class="nav-item active">
@@ -39,27 +38,30 @@
         </form>
     </nav>
 </head>
+
 <body class="bodyy">
-    <div>
-        <h1 style="margin:25px" class="text-center">Welcome To Your Items</h1>
-    </div>
-    <!--TODO: Add the for loop logic to grab all user items and put them in a card -->
-    <div class="d-flex flex-wrap flex-row-reverse justify-content-center">
-        <div th:each="item: ${listItems}" style="margin: 0 10px">
-            <div class="card" id="shopParent">
-                <div id="shopImageParent">
-                    <img class="card-img-top" id="shopImage" th:src="${item.imageURL}" th:alt="${item.name}">
-                </div>
-                <div class="card-body shadow-lg">
-                    <h5 class="card-title" th:text="${item.name}"> name </h5>
-                    <p class="card-text" id="shopDesc" th:text="${item.shopURL}">shopURL</p>
-                    <div class="priceSection" id="priceSection">
-                        <div class="price" th:text="${item.price}">price</div>
-                    </div>
-                </div>
+<div class="text-center">
+    <h1>Search results</h1><br>
+    <h3>NOTE: You cannot add items to lists that do not belong to you!</h3>
+    <div th:switch="${isListEmpty}">
+        <div th:case="false" class="container">
+            <div class="d-flex flex-wrap flex-row-reverse justify-content-center" style="margin:25px;">
+                <tr th:each="listName : ${listNames}">
+                    <a th:href="@{/wishlist(list=${listName})}" style="text-decoration:none; color:black;">
+                        <div class="card p-4 m-3 shadow-lg">
+                            <td th:text="${listName}">List Name</td>
+                        </div>
+                    </a>
+                </tr>
             </div>
-            <br>
+        </div>
+        <div th:case="true">
+            <div class="text-center">
+                <h3>No lists matched your query, try again.</h3>
+            </div>
         </div>
     </div>
+
+</div>
 </body>
 </html>

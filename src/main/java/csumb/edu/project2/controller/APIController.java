@@ -265,29 +265,36 @@ public class APIController {
     }
 
     @PatchMapping("/items")
-    public ResponseEntity<?> updateItem(@RequestParam String item_name, @RequestParam String list_name, @RequestParam Optional<Double> price, @RequestParam Optional<String> shopURL, @RequestParam Optional<String> imageURL,  @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
+    public ResponseEntity<?> updateItem(@RequestParam String item_name, @RequestParam String list_name, @RequestParam Optional<Double> price, @RequestParam Optional<String> shopURL, @RequestParam Optional<String> imageURL, @CookieValue(value = CookieNames.USERNAME, defaultValue = "") String login_username, @CookieValue(value = CookieNames.PASSWORD, defaultValue = "" ) String login_password ){
         if(!firebaseService.verifyUser(login_username, login_password)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         List<WishList> myWishlists;
         try {
             myWishlists = firebaseService.getAllWishLists(login_username);
-
             for (WishList x : myWishlists) {
                 if (x.getListName().equals(list_name)) {
+                    //not sure if this is a thing with 'Optional' but a comma is being inserted into our things, so to actually test for equality we need to remove it, and to properly update
+                    item_name = item_name.replace(",","");
+                    String tempShopURL = shopURL.get().replace(",","");
+                    String tempImageURL = imageURL.get().replace(",","");
                     for (Item y : x.getItems()) {
                         if ((y.getName()).equalsIgnoreCase(item_name)) {
-
                             if (price.isPresent()) {
                                 y.setPrice(price.get());
                             }
 
                             if (shopURL.isPresent()) {
-                                y.setShopURL(shopURL.get());
+                                y.setShopURL(tempShopURL);
                             }
 
                             if (imageURL.isPresent()) {
-                                y.setImageURL(imageURL.get());
+                                if(tempImageURL.isEmpty()){
+                                    String placeholderImg = "https://calgarylegacy.ca/wp-content/uploads/2020/02/480px-No_image_available.svg_.png";
+                                    y.setImageURL(placeholderImg);
+                                } else {
+                                    y.setImageURL(tempImageURL);
+                                }
                             }
 
                             firebaseService.updateWishListDetails(x);

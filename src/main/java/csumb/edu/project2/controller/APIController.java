@@ -291,8 +291,9 @@ public class APIController {
                             }
 
                             firebaseService.updateWishListDetails(x);
-
-                            return new ResponseEntity<>(HttpStatus.OK);
+                            HttpHeaders headers = new HttpHeaders();
+                            headers.setLocation(URI.create("/myitems"));
+                            return new ResponseEntity<>(headers, HttpStatus.FOUND);
                         }
                     }
                 }
@@ -320,7 +321,10 @@ public class APIController {
                         if (x.getItems().get(i).getName().equalsIgnoreCase(item_name)) {
                             x.getItems().remove(i);
                             firebaseService.updateWishListDetails(x);
-                            return new ResponseEntity<>(HttpStatus.OK);
+                            firebaseService.updateWishListDetails(x);
+                            HttpHeaders headers = new HttpHeaders();
+                            headers.setLocation(URI.create("/myitems"));
+                            return new ResponseEntity<>(headers, HttpStatus.FOUND);
 
                         }
                     }

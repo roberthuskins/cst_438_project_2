@@ -299,7 +299,7 @@ public class APIController {
 
                             firebaseService.updateWishListDetails(x);
                             HttpHeaders headers = new HttpHeaders();
-                            headers.setLocation(URI.create("/myitems"));
+                            headers.setLocation(URI.create("/wishlist?list="+list_name));
                             return new ResponseEntity<>(headers, HttpStatus.FOUND);
                         }
                     }
@@ -330,7 +330,7 @@ public class APIController {
                             firebaseService.updateWishListDetails(x);
                             firebaseService.updateWishListDetails(x);
                             HttpHeaders headers = new HttpHeaders();
-                            headers.setLocation(URI.create("/myitems"));
+                            headers.setLocation(URI.create("/wishlist?list="+list_name));
                             return new ResponseEntity<>(headers, HttpStatus.FOUND);
 
                         }

@@ -6,7 +6,6 @@ import csumb.edu.project2.objects.CookieNames;
 import csumb.edu.project2.objects.Item;
 import csumb.edu.project2.objects.User;
 import csumb.edu.project2.objects.WishList;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -190,12 +190,14 @@ public class WebController {
         currentListName = currentListName.replace("\"","");
         for(JsonElement item: items.getAsJsonArray()){
             //this removes double quotes from the string returned in the JSON response.
-            String n, p, s, i = "";
+            String n, p, s, i, e = "";
             n = item.getAsJsonObject().get("name").toString().replace("\"", "");
+            e = n.replaceAll(" ","-");
             p = item.getAsJsonObject().get("price").toString().replace("\"", "");
             s = item.getAsJsonObject().get("shopURL").toString().replace("\"", "");
             i = item.getAsJsonObject().get("imageURL").toString().replace("\"", "");
-            Map<String, String> myItem = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i);
+            //'e' adds a modal friendly name (for ID's sake)
+            Map<String, String> myItem = Map.of("name", n, "price", p, "shopURL",s, "imageURL", i, "modal",e);
             itemsInList.add(myItem);
         }
         boolean isListEmpty = true;

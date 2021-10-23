@@ -209,6 +209,51 @@ public class WebController {
         model.addAttribute("listName", currentListName);
         return "wishlist";
     }
+
+    @RequestMapping("/searchResults")
+        public String results(Model model, HttpServletRequest request, @RequestParam String search) throws IOException {
+        String apiURL = urlFetcher.getUrl() + "/wishlists?search="+search;
+        URL url = new URL(apiURL);
+        URLConnection req = url.openConnection();
+        String cookieValues = "";
+        Cookie[] cookies = request.getCookies();
+
+        if (urlFetcher.checkLoginCookies(cookies)) {
+            for (int i=0; i < cookies.length; i++) {
+                cookieValues += cookies[i].getName() + "=" + cookies[i].getValue();
+                if (i != cookies.length -1) {
+                    cookieValues+=";";
+                }
+            }
+            //this appends the cookies to the request that we are about to make with req.connect()
+            req.setRequestProperty("Cookie", cookieValues);
+        }
+        else {
+            //I would imagine you redirect to login page here, if we reach here it means that the user has no cookies;
+            return "redirect:/signin";
+        }
+
+        req.connect();
+
+        // Convert to a JSON object to print data
+        JsonParser jp = new JsonParser(); //from gson
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) req.getContent())); //Convert the input stream to a json element
+        JsonArray rootobj = root.getAsJsonArray();
+        ArrayList<String> listNames = new ArrayList<>();
+        for(JsonElement obj: rootobj){
+            //this removes double quotes from the string returned in the JSON response.
+            listNames.add(obj.getAsJsonObject().get("listName").toString().replace("\"", ""));
+        }
+        boolean isListEmpty = true;
+        if (listNames.size()>0){
+            isListEmpty = false;
+        }
+        model.addAttribute("isListEmpty", isListEmpty);
+        model.addAttribute("listNames", listNames);
+
+        return "results";
+    }
+
     @RequestMapping("/administrator")
     public String admin(Model model, HttpServletRequest request) throws IOException {
 

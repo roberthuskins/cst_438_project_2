@@ -30,75 +30,76 @@
                     </div>
                 </li>
             </ul>
-            <form class="form-inline ms-auto"  action="/wishlist?=(list=${listToSearch})">
+            <form class="form-inline ms-auto"  action="/searchResults?=(search=${search})">
                 <div class="input-group">
-                    <input class="form-control mr-sm-2" name="listToSearch" type="search" placeholder="Search lists by name..." aria-label="Search">
+                    <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search lists by name..." aria-label="Search">
                     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
                 </div>
             </form>
         </nav>
     </head>
 
-        <body class="text-center">
+    <body class="bodyy">
+        <div class="text-center">
+            <h1>Welcome to your LaundryList</h1><br>
 
-        <h1>Welcome to your LaundryList</h1><br>
+            <div th:switch="${isListEmpty}">
+                <div th:case="false" class="container">
+                    <div class="d-flex flex-wrap flex-row-reverse justify-content-center" style="margin:25px;">
+                        <tr th:each="listName : ${listNames}">
+                            <a th:href="@{/wishlist(list=${listName})}" style="text-decoration:none; color:black;">
+                                <div class="card p-4 m-3 shadow-lg">
+                                    <td th:text="${listName}">List Name</td>
+                                </div>
+                            </a>
+                        </tr>
+                    </div>
+                </div>
+                <div th:case="true">
+                    <div class="text-center">
+                        <h3>You currently do not have any lists, add one using the button below.</h3>
+                    </div>
+                </div>
+            </div>
 
-        <div th:switch="${isListEmpty}">
-            <div th:case="false" class="container">
-                <div class="d-flex justify-content-around" style="margin:25px">
-                    <tr th:each="listName : ${listNames}">
-                        <a th:href="@{/wishlist(list=${listName})}">
-                            <div class="card">
-                                <td th:text="${listName}">List Name</td>
+            <div class="container mt-5">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#add-wishlist-modal" class="btn btn-primary btn-floating" id="add-wishlist">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                        <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+                    </svg>
+                </button>
+                <div class="modal" id="add-wishlist-modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create a new wishlist</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-                        </a>
-                    </tr>
-                </div>
-            </div>
-            <div th:case="true">
-                <div class="text-center">
-                    <h3>You currently do not have any lists, add one using the button below.</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="container mt-5">
-            <button type="button" data-bs-toggle="modal" data-bs-target="#add-wishlist-modal" class="btn btn-primary btn-floating" id="add-wishlist">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                    <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
-                </svg>
-            </button>
-            <div class="modal" id="add-wishlist-modal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Create a new wishlist</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="/initWishlist" method="post">
-                                <div class="mb-3">
-                                    <div class="form-floating" style="padding-left:1px">
-                                        <input name="listName" id="floatingInput" class="form-control" type="text" placeholder="New Wishlist" required>
-                                        <label for="floatingInput">List Name</label>
+                            <div class="modal-body">
+                                <form action="/initWishlist" method="post">
+                                    <div class="mb-3">
+                                        <div class="form-floating" style="padding-left:1px">
+                                            <input name="listName" id="floatingInput" class="form-control" type="text" placeholder="New Wishlist" required>
+                                            <label for="floatingInput">List Name</label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">List Visibility</label><br>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="isPublic" id="publicVisibility" value="1">
-                                        <label class="form-check-label" for="publicVisibility">Public</label>
+                                    <div class="mb-3">
+                                        <label class="form-label">List Visibility</label><br>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="isPublic" id="publicVisibility" value="1">
+                                            <label class="form-check-label" for="publicVisibility">Public</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="isPublic" id="privateVisibility" value="0" checked>
+                                            <label class="form-check-label" for="privateVisibility">Private</label>
+                                        </div>
                                     </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="isPublic" id="privateVisibility" value="0" checked>
-                                        <label class="form-check-label" for="privateVisibility">Private</label>
+                                    <div class="modal-footer">
+                                        <button type="submit" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" data-bs-dismiss="modal" class="btn btn-danger">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

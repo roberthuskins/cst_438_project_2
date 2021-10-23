@@ -9,37 +9,41 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
     <title>Login for LaundryList</title>
 </head>
-<body class="text-center">
-<main class="form-signIn">
-    <h1 style="margin:25px">Login</h1><br>
-    <br>
-    <form action="/login" method="post">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm"></div>
-                <div class="form-floating w-25" style="padding-left:1px">
-                    <input name="username" id="floatingInput" class="form-control" type="email" placeholder="email@example.com" required>
-                    <label for="floatingInput"> Email Address</label>
-                </div>
-                <div class="col-sm"></div>
-            </div>
+<body>
+    <main class="form-signIn">
+        <div>
+            <h1 style="margin:25px" class="text-center">Login</h1>
         </div>
         <br>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm"></div>
-                <div class="form-floating w-25" style="padding-left:1px">
-                    <input name="password" id="floatingPassword" class="form-control" type="password" placeholder="password" required>
-                    <label for="floatingPassword">Password</label>
+        <form action="/login" method="post">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm"></div>
+                    <div class="form-floating w-25" style="padding-left:1px">
+                        <input name="username" id="floatingInput" class="form-control" type="email" placeholder="email@example.com" required>
+                        <label for="floatingInput"> Email Address</label>
+                    </div>
+                    <div class="col-sm"></div>
                 </div>
-                <div class="col-sm"></div>
             </div>
-        </div>
-        <br>
-        <button type="submit" class="w-25 btn btn-lg btn-primary">Sign In</button>
-        <p class="mt-5 mb-3 text-muted">Don't have an account?</p> <a class="mt-5 mb-3 text-muted" href="/register">Sign Up</a>
-    </form>
-</main>
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm"></div>
+                    <div class="form-floating w-25" style="padding-left:1px">
+                        <input name="password" id="floatingPassword" class="form-control" type="password" placeholder="password" required>
+                        <label for="floatingPassword">Password</label>
+                    </div>
+                    <div class="col-sm"></div>
+                </div>
+            </div>
+            <br>
+            <div class="text-center">
+                <button type="submit" class="w-25 btn btn-lg btn-primary">Sign In</button>
+                <p class="mt-5 mb-3 text-muted">Don't have an account?</p> <a class="mt-5 mb-3 text-muted" href="/register">Sign Up</a>
+            </div>
+        </form>
+    </main>
 
 </body>
 </html>
